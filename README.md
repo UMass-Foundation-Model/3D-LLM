@@ -22,6 +22,7 @@
     <img src="figs/pipeline.png" alt="Logo" width="80%">
   </p>
 </p>
+Preliminary Code.
 
 ## Three-step 3D Feature Extraction
 ### First step
@@ -134,3 +135,7 @@ If you find our work useful, please consider citing:
 https://github.com/salesforce/LAVIS
 
 https://github.com/mlfoundations/open_flamingo
+
+https://github.com/concept-fusion/concept-fusion
+
+https://github.com/evelinehong/3D-CLR-Official

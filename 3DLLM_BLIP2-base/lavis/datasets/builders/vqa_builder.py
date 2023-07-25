@@ -8,7 +8,7 @@
 from lavis.datasets.builders.base_dataset_builder import BaseDatasetBuilder
 
 from lavis.common.registry import registry
-from lavis.datasets.datasets.aok_vqa_datasets import ThreeDVQADataset, ThreeDVQAEvalDataset
+from lavis.datasets.datasets.threedvqa_datasets import ThreeDVQADataset, ThreeDVQAEvalDataset
 
 
 @registry.register_builder("3d_vqa")

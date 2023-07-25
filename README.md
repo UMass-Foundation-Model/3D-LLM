@@ -45,7 +45,8 @@ $ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/p
 # use flant5
 $ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_flant5_ft.yaml
 ```
-
+## 3D-LLM_flamingo-based
+TODO.
 
 ## Citation
 

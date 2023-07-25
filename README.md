@@ -15,7 +15,33 @@
   </p>
 </p>
 
-## 
+## Installation
+
+Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
+
+```shell
+$ conda create -n lavis python=3.8
+$ conda activate lavis
+
+$ git clone https://github.com/salesforce/LAVIS.git SalesForce-LAVIS
+$ cd SalesForce-LAVIS
+$ pip install -e .
+
+$ pip install positional_encodings
+```
+
+## Training
+
+```shell
+$ cd 3DLLM_BLIP2-base
+
+$ conda activate lavis
+# use facebook/opt-2.7b:
+$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_ft.yaml
+# use flant5
+$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_flant5_ft.yaml
+```
+
 
 ## Citation
 
@@ -29,3 +55,9 @@ If you find our work useful, please consider citing:
  year = {2023},
 } 
 ```
+
+### Acknowledgements
+
+https://github.com/salesforce/LAVIS
+
+https://github.com/mlfoundations/open_flamingo

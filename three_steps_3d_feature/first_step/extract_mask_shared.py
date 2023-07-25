@@ -44,16 +44,10 @@ if __name__ == '__main__':
     scene_dir = args.scene_dir_path
     save_dir = args.save_dir_path
 
-    try:
-        os.mkdir(os.path.join(save_dir))
-    except:
-        pass
+    os.makedirs(save_dir, exist_ok=True)
 
     for scan in tqdm(os.listdir(scene_dir)):
-        try:
-            os.mkdir(os.path.join(save_dir, scan))
-        except:
-            pass
+        os.makedirs(os.path.join(save_dir, scan), exist_ok=True)
         
         rgb_list = glob.glob(os.path.join(scene_dir, scan, "*png"))
 

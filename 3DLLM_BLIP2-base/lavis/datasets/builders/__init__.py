@@ -24,12 +24,7 @@ from lavis.datasets.builders.classification_builder import (
 )
 from lavis.datasets.builders.imagefolder_builder import ImageNetBuilder
 from lavis.datasets.builders.video_qa_builder import MSRVTTQABuilder, MSVDQABuilder
-from lavis.datasets.builders.vqa_builder import (
-    COCOVQABuilder,
-    OKVQABuilder,
-    VGVQABuilder,
-    GQABuilder,
-)
+from lavis.datasets.builders.vqa_builder import ThreeDVQABuilder
 from lavis.datasets.builders.retrieval_builder import (
     MSRVTTRetrievalBuilder,
     DiDeMoRetrievalBuilder,
@@ -43,12 +38,10 @@ from lavis.common.registry import registry
 __all__ = [
     "COCOCapBuilder",
     "COCORetrievalBuilder",
-    "COCOVQABuilder",
     "ConceptualCaption12MBuilder",
     "ConceptualCaption3MBuilder",
     "DiDeMoRetrievalBuilder",
     "Flickr30kBuilder",
-    "GQABuilder",
     "ImageNetBuilder",
     "MSRVTTCapBuilder",
     "MSRVTTQABuilder",
@@ -56,12 +49,10 @@ __all__ = [
     "MSVDCapBuilder",
     "MSVDQABuilder",
     "NLVRBuilder",
-    "OKVQABuilder",
     "SBUCaptionBuilder",
     "SNLIVisualEntailmentBuilder",
     "VATEXCapBuilder",
     "VGCaptionBuilder",
-    "VGVQABuilder",
     "AVSDDialBuilder",
 ]
 

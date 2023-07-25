@@ -15,7 +15,11 @@
   </p>
 </p>
 
-## Installation
+## Three-step 3D Feature Extraction
+TODO.
+
+## 3D-LLM_BLIP2-based
+### Installation
 
 Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
 
@@ -30,7 +34,7 @@ $ pip install -e .
 $ pip install positional_encodings
 ```
 
-## Training
+### Training
 
 ```shell
 $ cd 3DLLM_BLIP2-base

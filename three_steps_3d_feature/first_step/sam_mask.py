@@ -12,11 +12,11 @@ import glob
 import argparse
 from tqdm import tqdm
 
-def main():
 
+def main():
     parser = argparse.ArgumentParser(description="Specify dirs")
-    parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
-    parser.add_argument('--save_dir_path', default="./sam_masks/", type=str)
+    parser.add_argument("--scene_dir_path", default="./masked_rdp_data/", type=str)
+    parser.add_argument("--save_dir_path", default="./sam_masks/", type=str)
     args = parser.parse_args()
 
     torch.autograd.set_grad_enabled(False)
@@ -38,15 +38,12 @@ def main():
     print("Extracting SAM masks...")
     room_list = os.listdir(args.scene_dir_path)
 
-    model, _, preprocess = open_clip.create_model_and_transforms(
-        "ViT-H-14", "laion2b_s32b_b79k"
-    )
+    model, _, preprocess = open_clip.create_model_and_transforms("ViT-H-14", "laion2b_s32b_b79k")
     model.cuda()
     model.eval()
 
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print('Device:', device)
+    print("Device:", device)
 
     dataset_dir = args.scene_dir_path
 
@@ -54,7 +51,6 @@ def main():
         os.makedirs(save_dir + room, exist_ok=True)
         dataset_path = dataset_dir + room + "/*png"
         data_list = glob.glob(dataset_path)
-
 
         for img_name in data_list:
             img_base_name = os.path.basename(img_name)
@@ -67,7 +63,7 @@ def main():
                 )
                 if os.path.exists(savefile):
                     continue
-    
+
                 imgfile = img_name
                 img = cv2.imread(imgfile)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -78,16 +74,17 @@ def main():
                     room,
                     os.path.splitext(os.path.basename(imgfile))[0] + ".pt",
                 )
-    
+
                 mask_list = []
                 for mask_item in masks:
                     mask_list.append(mask_item["segmentation"])
-                    
+
                 mask_np = np.asarray(mask_list)
                 mask_torch = torch.from_numpy(mask_np)
                 torch.save(mask_torch, _savefile)
             except:
                 pass
+
 
 if __name__ == "__main__":
     main()

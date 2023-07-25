@@ -60,7 +60,7 @@ There are four options: (1) Extract CLIP feature with Mask2Former masks; (2) Ext
 
 Extract 2D CLIP features with Mask2Former masks:
 ```shell
-$ cd ./three_steps_3d_feature/third_step/
+$ cd ./three_steps_3d_feature/second_step/
 
 $ python clip_maskformer.py --scene_dir_path DATA_DIR_WITH_RGB_IMAGES --mask_dir_path MASK_DIR_FROM_1ST_STEP --save_dir_path DIR_YOU_WANT_TO_SAVE_THE_FEAT
 ```
@@ -133,6 +133,10 @@ If you find our work useful, please consider citing:
 ### Acknowledgements
 
 https://github.com/salesforce/LAVIS
+
+https://github.com/facebookresearch/Mask2Former
+
+https://github.com/facebookresearch/segment-anything
 
 https://github.com/mlfoundations/open_flamingo
 

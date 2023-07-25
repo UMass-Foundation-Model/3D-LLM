@@ -16,6 +16,7 @@ import argparse
 
 import json
 
+
 def setup_cfg(args):
     # load config from file and command-line arguments
     cfg = get_cfg()
@@ -31,13 +32,12 @@ MASK2FORMER_CONFIG_FILE = "./maskformer2_swin_large_IN21k_384_bs16_100ep.yaml"
 MASK2FORMER_WEIGHTS_FILE = "./model_final_e5f453.pkl"
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     torch.autograd.set_grad_enabled(False)
 
     parser = argparse.ArgumentParser(description="Specify dirs")
-    parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
-    parser.add_argument('--save_dir_path', default="./maskformer_masks/", type=str)
+    parser.add_argument("--scene_dir_path", default="./masked_rdp_data/", type=str)
+    parser.add_argument("--save_dir_path", default="./maskformer_masks/", type=str)
     args = parser.parse_args()
 
     scene_dir = args.scene_dir_path
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     for scan in tqdm(os.listdir(scene_dir)):
         os.makedirs(os.path.join(save_dir, scan), exist_ok=True)
-        
+
         rgb_list = glob.glob(os.path.join(scene_dir, scan, "*png"))
 
         for img2_idx in range(len(rgb_list)):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             MASK_LOAD_FILE = os.path.join(save_dir, scan, str(img2_idx) + ".pt")
             LOAD_IMG_HEIGHT = 512
             LOAD_IMG_WIDTH = 512
-    
+
             cfgargs = types.SimpleNamespace()
             cfgargs.imgfile = IMGFILE
             cfgargs.config_file = MASK2FORMER_CONFIG_FILE
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
             cfg = setup_cfg(cfgargs)
             demo = VisualizationDemo(cfg)
-            
+
             img = read_image(IMGFILE, format="BGR")
 
             predictions, visualized_output = demo.run_on_image(img)
@@ -71,5 +71,4 @@ if __name__ == '__main__':
                 predictions["instances"].pred_masks.unsqueeze(0), [LOAD_IMG_HEIGHT, LOAD_IMG_WIDTH], mode="nearest"
             )
             masks = masks.half()
-            torch.save(masks[0].detach().cpu(), MASK_LOAD_FILE)   
-
+            torch.save(masks[0].detach().cpu(), MASK_LOAD_FILE)

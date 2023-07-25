@@ -28,7 +28,6 @@ class __DisplMixin:
                 "question": ann["question"],
                 "question_id": ann["question_id"],
                 "answer": "; ".join(ann["answers"]),
-                "image": sample["image"],
                 "pc_feat": sample["pc_feat"],
                 "pc": sample["pc"],
             }
@@ -42,15 +41,14 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
         ann_root (string): directory to store the annotation file
         """
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
-
-        self.img_ids = {}
+        self.scene_ids = {}
         n = 0
         new_annotation = []
         for ann in self.annotation:
             try:
                 img_id = ann["scene_id"]
-                if img_id not in self.img_ids.keys():
-                    self.img_ids[img_id] = n
+                if img_id not in self.scene_ids.keys():
+                    self.scene_ids[img_id] = n
                     n += 1
                 new_annotation.append(ann)
             except:
@@ -64,10 +62,6 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
 
     def __getitem__(self, index):
         ann = self.annotation[index]
-        image = np.random.randint(0, 255, (640, 480, 3), dtype=np.uint8)
-        image = Image.fromarray(image)
-        image = self.vis_processor(image)
-
         caption = self.text_processor(ann["question"])
         scene_id = ann["scene_id"]
         pc_feat = torch.load(os.path.join(self.pc_feat_root, f"{scene_id}.pt"), map_location="cpu")
@@ -95,13 +89,12 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
         weights = list(answer_weight.values())
 
         return {
-            "image": image,
             "pc_feat": pc_feat,
             "pc": pc,
             "text_input": caption,
             "answer": answers,
             "weight": weights,
-            "image_id": self.img_ids[ann["scene_id"]],
+            "scene_id": self.scene_ids[ann["scene_id"]],
             "question_id": index,
         }
 
@@ -118,14 +111,14 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
         """
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
-        self.img_ids = {}
+        self.scene_ids = {}
         n = 0
         new_annotation = []
         for ann in self.annotation:
             try:
                 img_id = ann["scene_id"]
-                if img_id not in self.img_ids.keys():
-                    self.img_ids[img_id] = n
+                if img_id not in self.scene_ids.keys():
+                    self.scene_ids[img_id] = n
                     n += 1
                 new_annotation.append(ann)
             except:
@@ -139,9 +132,6 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
 
     def __getitem__(self, index):
         ann = self.annotation[index]
-        image = np.random.randint(0, 255, (640, 480, 3), dtype=np.uint8)
-        image = Image.fromarray(image)
-        image = self.vis_processor(image)
         caption = self.text_processor(ann["question"])
         scene_id = ann["scene_id"]
         pc_feat = torch.load(os.path.join(self.pc_feat_root, f"{scene_id}.pt"), map_location="cpu")  # [N, 1408]
@@ -159,14 +149,16 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
             pc = torch.cat([pc, torch.zeros(10000 - pc.shape[0], 3)], dim=0)
 
         return {
-            "image": image,
             "pc_feat": pc_feat,
             "pc": pc,
             "text_input": caption,
-            "image_id": self.img_ids[scene_id],
+            "image_id": self.scene_ids[scene_id],
             "instance_id": scene_id,
             "question_id": index,
         }
+
+    def __len__(self):
+        return len(self.annotation)
 
 
 class NoCapsEvalDataset(VQAEvalDataset):
@@ -180,9 +172,6 @@ class NoCapsEvalDataset(VQAEvalDataset):
 
     def __getitem__(self, index):
         ann = self.annotation[index]
-        image = np.random.randint(0, 255, (640, 480, 3), dtype=np.uint8)
-        image = Image.fromarray(image)
-        image = self.vis_processor(image)
         scene_id = ann["scene_id"]
         pc_feat = torch.load(os.path.join(self.pc_feat_root, f"{scene_id}.pt"), map_location="cpu")
         # sample 10000 points: [N, 1408] -> [10000, 1408]
@@ -192,9 +181,7 @@ class NoCapsEvalDataset(VQAEvalDataset):
             pc_feat = torch.cat([pc_feat, torch.zeros(10000 - pc_feat.shape[0], 1408)], dim=0)
         caption = self.text_processor(ann["question"])
         return {
-            "image": image,
             "pc_feat": pc_feat,
             "text_input": caption,
-            "image_id": self.img_ids[scene_id],
             "instance_id": scene_id,
         }

@@ -72,7 +72,7 @@ class Blip2T5(Blip2Base):
         self.t5_tokenizer = T5TokenizerFast.from_pretrained(t5_model)
 
         location_tokens = []
-        for i in range(11):  # pc -> x,y,z tokens
+        for i in range(64):  # pc -> x,y,z tokens
             location_tokens.append("<loc%d>" % i)  # bbox_min: 500; bbox_max: 550; (xmin, ymin, zmin) (xmax, ymax, zmax)
         self.t5_tokenizer.add_special_tokens({"additional_special_tokens": location_tokens})
 
@@ -96,7 +96,7 @@ class Blip2T5(Blip2Base):
         self.pos_embedding = pos_model(x).squeeze().cuda()
 
         self.max_txt_len = max_txt_len
-        self.prompt = "Question: {} Short answer:"
+        self.prompt = ""
         self._apply_lemmatizer = apply_lemmatizer
         self._lemmatizer = None
 

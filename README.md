@@ -1,7 +1,15 @@
 <br />
 <p align="center">
   <h1 align="center">3D-LLM: Injecting the 3D World into Large Language Models</h1>
-
+  <p align="center">
+    <a href="https://evelinehong.github.io">Yining Hong</a>,
+    <a href="https://haoyuzhen.com">Haoyu Zhen</a>,
+    <a href="https://peihaochen.github.io">Peihao Chen</a>,
+    <a href="https://zsh2000.github.io">Shuhong Zheng</a>,
+    <a href="https://yilundu.github.io">Yilun Du</a>,
+    <a href="https://zfchenunique.github.io">Zhenfang Chen</a>,
+    <a href="https://people.csail.mit.edu/ganchuang">Chuang Gan</a>
+  </p>
   <p align="center">
     <a href='https://arxiv.org/abs/2307.12981'>
       <img src='https://img.shields.io/badge/Paper-PDF-red?style=flat&logo=arXiv&logoColor=red' alt='Paper PDF'>

@@ -29,7 +29,7 @@ $ ln -s {path/to/examples} .
 ```shell
 $ conda activate lavis
 # use facebook/opt-2.7b:
-$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/okvqa_ft.yaml
+$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_ft.yaml
 # use flant5
-$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/okvqa_flant5_ft.yaml
+$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_flant5_ft.yaml
 ```

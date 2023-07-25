@@ -35,7 +35,7 @@ class __DisplMixin:
         )
 
 
-class AOKVQADataset(VQADataset, __DisplMixin):
+class ThreeDVQADataset(VQADataset, __DisplMixin):
     def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
@@ -109,7 +109,7 @@ class AOKVQADataset(VQADataset, __DisplMixin):
         return len(self.annotation)
 
 
-class AOKVQAEvalDataset(VQAEvalDataset):
+class ThreeDVQAEvalDataset(VQAEvalDataset):
     def __init__(self, vis_processor, text_processor, vis_root, ann_paths):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
@@ -194,7 +194,7 @@ class NoCapsEvalDataset(VQAEvalDataset):
         return {
             "image": image,
             "pc_feat": pc_feat,
-            "text_input": question,
+            "text_input": caption,
             "image_id": self.img_ids[scene_id],
             "instance_id": scene_id,
         }

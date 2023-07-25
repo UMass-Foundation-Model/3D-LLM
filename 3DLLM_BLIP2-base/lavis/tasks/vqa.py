@@ -224,8 +224,8 @@ class GQATask(VQATask):
     # return metrics
 
 
-@registry.register_task("aok_vqa")
-class AOKVQATask(VQATask):
+@registry.register_task("3d_vqa")
+class ThreeDVQATask(VQATask):
     pass
 
 

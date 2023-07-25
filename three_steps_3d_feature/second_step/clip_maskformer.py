@@ -14,8 +14,6 @@ from PIL import Image
 
 
 def get_bbox_around_mask(mask):
-    # mask: (img_height, img_width)
-    # compute bbox around mask
     bbox = None
     nonzero_inds = torch.nonzero(mask)  # (num_nonzero, 2)
     if nonzero_inds.numel() == 0:
@@ -46,7 +44,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Specify dirs")
     parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
     parser.add_argument('--mask_dir_path', default="./maskformer_masks/", type=str)
-    parser.add_argument('--save_dir_path', default="./nps_sam_clip/", type=str)
+    parser.add_argument('--save_dir_path', default="./nps_maskformer_clip/", type=str)
     args = parser.parse_args()
 
     scene_lists = sorted(os.listdir(args.scene_dir_path))
@@ -86,6 +84,7 @@ if __name__ == '__main__':
 
                 mask = torch.load(MASK_LOAD_FILE).unsqueeze(0)  # 1, num_masks, H, W
                 num_masks = mask.shape[-3]
+                pallete = get_new_pallete(num_masks)
 
                 rois = []
                 roi_similarities_with_global_vec = []
@@ -154,6 +153,7 @@ if __name__ == '__main__':
                 outfeat = torch.nn.functional.normalize(outfeat, dim=-1)
                 outfeat = outfeat[0].half() # --> H, W, feat_dim
 
+                
                 torch.save(outfeat, SEMIGLOBAL_FEAT_SAVE_FILE)
             except:
                 print(SEMIGLOBAL_FEAT_SAVE_FILE, "fail")

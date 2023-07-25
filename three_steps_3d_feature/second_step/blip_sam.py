@@ -29,19 +29,20 @@ def get_bbox_around_mask(mask):
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('Device:', device)
+
+    parser = argparse.ArgumentParser(description="Specify dirs")
+    parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
+    parser.add_argument('--mask_dir_path', default="./sam_masks/", type=str)
+    parser.add_argument('--save_dir_path', default="./nps_sam_blip/", type=str)
+    args = parser.parse_args()
     
-    dataset_dir = "/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_2/"
-    mask_dir = "/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masks_sam/"
-    for scene in tqdm(sorted(os.listdir(dataset_dir))):
+    for scene in tqdm(sorted(os.listdir(args.scene_dir_path))):
         try:
-            if scene + ".pt" in os.listdir(dataset_dir):
-               continue
+            os.makedirs(os.path.join(args.save_dir_path, scene), exist_ok=True)
     
-            os.makedirs(os.path.join(dataset_dir, scene, "nps_sam_blip"), exist_ok=True)
-    
-            for file in os.listdir(os.path.join(mask_dir, scene)):
-                INPUT_IMAGE_PATH = os.path.join(dataset_dir, scene, file.replace(".pt", ".png"))
-                SEMIGLOBAL_FEAT_SAVE_FILE = os.path.join(dataset_dir, scene, "nps_sam_blip", file)
+            for file in os.listdir(os.path.join(args.mask_dir_path, scene)):
+                INPUT_IMAGE_PATH = os.path.join(args.scene_dir_path, scene, file.replace(".pt", ".png"))
+                SEMIGLOBAL_FEAT_SAVE_FILE = os.path.join(args.save_dir_path, scene, file)
     
                 if os.path.isfile(SEMIGLOBAL_FEAT_SAVE_FILE):
                     continue
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     
                 cosine_similarity = torch.nn.CosineSimilarity(dim=-1)
     
-                MASK_LOAD_FILE = os.path.join(mask_dir, scene, file)
+                MASK_LOAD_FILE = os.path.join(args.mask_dir_path, scene, file)
                 outfeat = torch.zeros(512, 512, FEAT_DIM, dtype=torch.half)
     
                 print(f"Loading instance masks {MASK_LOAD_FILE}...")

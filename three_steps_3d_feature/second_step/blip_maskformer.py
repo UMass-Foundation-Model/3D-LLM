@@ -10,9 +10,8 @@ import argparse
 LOAD_IMG_HEIGHT = 512
 LOAD_IMG_WIDTH = 512
 
+
 def get_bbox_around_mask(mask):
-    # mask: (img_height, img_width)
-    # compute bbox around mask
     bbox = None
     nonzero_inds = torch.nonzero(mask)  # (num_nonzero, 2)
     if nonzero_inds.numel() == 0:
@@ -29,21 +28,21 @@ def get_bbox_around_mask(mask):
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('Device:', device)
-
+   
     parser = argparse.ArgumentParser(description="Specify dirs")
     parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
-    parser.add_argument('--mask_dir_path', default="./sam_masks/", type=str)
-    parser.add_argument('--save_dir_path', default="./nps_sam_blip/", type=str)
+    parser.add_argument('--mask_dir_path', default="./maskformer_masks/", type=str)
+    parser.add_argument('--save_dir_path', default="./nps_maskformer_blip/", type=str)
     args = parser.parse_args()
-    
-    for scene in tqdm(sorted(os.listdir(args.scene_dir_path))):
+ 
+    for scene in tqdm(os.listdir(args.scene_dir_path)):
         try:
             os.makedirs(os.path.join(args.save_dir_path, scene), exist_ok=True)
     
             for file in os.listdir(os.path.join(args.mask_dir_path, scene)):
                 INPUT_IMAGE_PATH = os.path.join(args.scene_dir_path, scene, file.replace(".pt", ".png"))
                 SEMIGLOBAL_FEAT_SAVE_FILE = os.path.join(args.save_dir_path, scene, file)
-    
+
                 if os.path.isfile(SEMIGLOBAL_FEAT_SAVE_FILE):
                     continue
     
@@ -52,16 +51,16 @@ if __name__ == '__main__':
                 image = torch.tensor(raw_image[:512, :512]).permute(2, 0, 1).unsqueeze(0).to(device)
     
                 visual_encoder = create_eva_vit_g(512).to(device)
-                global_feat = visual_encoder(image) # instead of using output we can directly set the global_feat. since visual_encoder is a model that processes images and outputs a tensor
-                # global_feat = torch.tensor(output)
-
+                output = visual_encoder(image)
+        
+                global_feat = torch.tensor(output)
                 global_feat = global_feat.half().cuda()
                 global_feat = global_feat[:,:-1,:].resize(1,36,36,1408).permute((0,3,1,2))
                 m = nn.AdaptiveAvgPool2d((1, 1))
                 global_feat = m(global_feat)
                 global_feat = global_feat.squeeze(-1).squeeze(-1)
     
-                global_feat = torch.nn.functional.normalize(global_feat, dim=-1) 
+                global_feat = torch.nn.functional.normalize(global_feat, dim=-1)  # --> (1, 1024)
                 FEAT_DIM = global_feat.shape[-1]
     
                 cosine_similarity = torch.nn.CosineSimilarity(dim=-1)
@@ -71,9 +70,9 @@ if __name__ == '__main__':
     
                 print(f"Loading instance masks {MASK_LOAD_FILE}...")
                 mask = torch.load(MASK_LOAD_FILE).unsqueeze(0)  # 1, num_masks, H, W
-                
                 mask = mask[:, :, :512, :512]
                 num_masks = mask.shape[-3]
+                pallete = get_new_pallete(num_masks)
     
                 rois = []
                 roi_similarities_with_global_vec = []
@@ -82,7 +81,8 @@ if __name__ == '__main__':
                 roi_nonzero_inds = []
     
                 for _i in range(num_masks):
-                    curmask = mask[0, _i].long()
+    
+                    curmask = mask[0, _i]
                     bbox, nonzero_inds = get_bbox_around_mask(curmask)
                     x0, y0, x1, y1 = bbox
     
@@ -97,10 +97,7 @@ if __name__ == '__main__':
                     roi[x0:x1, y0:y1] = img_roi
                     img_roi = roi.permute(2, 0, 1).unsqueeze(0).to(device)
                     roifeat = visual_encoder(img_roi)
-                    
-                    # roifeat is already a tensor, no need for a new conversion.
-                    # roifeat = torch.tensor(roifeat)
-
+                    roifeat = torch.tensor(roifeat)
                     roifeat = roifeat.half().cuda()
                     roifeat = roifeat[:,:-1,:].resize(1,36,36,1408).permute((0,3,1,2))
                     m = nn.AdaptiveAvgPool2d((1, 1))
@@ -115,13 +112,13 @@ if __name__ == '__main__':
     
                     rois.append(torch.tensor(list(bbox)))
                     roi_similarities_with_global_vec.append(_sim)
-                    roi_sim_per_unit_area.append(_sim)
+                    roi_sim_per_unit_area.append(_sim)# / iou)
     
     
                 rois = torch.stack(rois)
                 scores = torch.cat(roi_sim_per_unit_area).to(rois.device)
                 retained = torchvision.ops.nms(rois.float().cpu(), scores.float().cpu(), iou_threshold=1.0)
-                feat_per_roi = torch.cat(feat_per_roi, dim=0)
+                feat_per_roi = torch.cat(feat_per_roi, dim=0)  # N, 1024
     
                 print(f"retained {len(retained)} masks of {rois.shape[0]} total")
                 retained_rois = rois[retained]
@@ -130,6 +127,7 @@ if __name__ == '__main__':
                 retained_nonzero_inds = []
                 for _roiidx in range(retained.shape[0]):
                     retained_nonzero_inds.append(roi_nonzero_inds[retained[_roiidx].item()])
+    
     
                 mask_sim_mat = torch.nn.functional.cosine_similarity(
                     retained_feat[:, :, None], retained_feat.t()[None, :, :]
@@ -153,7 +151,7 @@ if __name__ == '__main__':
                 outfeat = torch.nn.functional.normalize(outfeat, dim=-1)
                 outfeat = outfeat[0].half() # --> H, W, feat_dim
     
-                print(outfeat.shape)
+                print (outfeat.shape)
                 torch.save(outfeat, SEMIGLOBAL_FEAT_SAVE_FILE)
         except:
            pass

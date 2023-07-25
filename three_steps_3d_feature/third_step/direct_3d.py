@@ -22,7 +22,7 @@ from scipy.spatial.transform import Rotation as R
 
 import sys
 
-from flamingo_demo.Habitat_Mapping_Implement.tools import Application
+from tools import Application
 
 
 def robot2world(position, u, v , heading):
@@ -41,18 +41,17 @@ def transformation_quatrtnion2heading(rotation:quaternion):
     return heading
 
 
-def main(room_name):
-    sample_num = 300000
-    feature_dir = os.path.join("/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_2/", room_name, "nps_1024_hiddAve_ViTL")
-    data_dir = os.path.join("/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_2/", room_name)
+def main(room_name, data_root_dir, depth_dir, feat_dir, sample_num):
+    feature_dir = os.path.join(feat_dir, room_name)
+    data_dir = os.path.join(data_root_dir, room_name)
 
     try:
-        if os.path.exists(os.path.join(data_dir, "pcd_feat_clip.pt")) and torch.load(os.path.join(data_dir, "pcd_feat_clip.pt")).shape[0] > 0:
+        if os.path.exists(os.path.join(data_dir, "pcd_feat.pt")) and torch.load(os.path.join(data_dir, "pcd_feat.pt")).shape[0] > 0:
             return
     except:
         pass
 
-    depth_dir = os.path.join("/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_depth/", room_name)
+    depth_dir = os.path.join(depth_dir, room_name)
     api = Application((512, 512), 90, 1, 0.005, 600, 1.5, 1, 2)
     pc_pos = []
     pc_feat = []
@@ -119,16 +118,19 @@ def main(room_name):
         final_features = pc_feat
 
     print(final_points.shape)
-    torch.save(final_points, os.path.join(data_dir, "pcd_pos_clip.pt"))
-    torch.save(final_features, os.path.join(data_dir, "pcd_feat_clip.pt"))
+    torch.save(final_points, os.path.join(data_dir, "pcd_pos.pt"))
+    torch.save(final_features, os.path.join(data_dir, "pcd_feat.pt"))
 
 
 if __name__ == '__main__':
-    print('Caching hm3d observations ...')
-    room_list = os.listdir("/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_2/")
+    parser = argparse.ArgumentParser(description="Specify dirs")
+    parser.add_argument('--data_dir_path', default="./masked_rdp_data/", type=str)
+    parser.add_argument('--depth_dir_path', default="./masked_rdp_data/", type=str)
+    parser.add_argument('--feat_dir_path', default="./maskformer_masks/", type=str)
+    parser.add_argument('--sample_num', default=300000, type=int)
+    args = parser.parse_args()
 
-    parser = argparse.ArgumentParser(description="Scene")
-    parser.add_argument('--job', default=0, type=int)
+    room_list = os.listdir(args.data_dir_path)
 
     for room_name in room_list:
-        main(room_name)
+        main(room_name, args.data_dir_path, args.depth_dir_path, args.feat_dir_path, args.sample_num)

@@ -15,7 +15,7 @@ from tqdm import tqdm
 def main():
 
     parser = argparse.ArgumentParser(description="Specify dirs")
-    parser.add_argument('--scene_dir_path', default="/gpfs/u/home/LMCG/LMCGnngn/scratch-shared/masked_rdp_2/", type=str)
+    parser.add_argument('--scene_dir_path', default="./masked_rdp_data/", type=str)
     parser.add_argument('--save_dir_path', default="./sam_masks/", type=str)
     args = parser.parse_args()
 

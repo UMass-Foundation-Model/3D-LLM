@@ -76,7 +76,7 @@ class Blip2OPT(Blip2Base):
         self.opt_tokenizer = AutoTokenizer.from_pretrained(opt_model, use_fast=False)
 
         location_tokens = []
-        for i in range(11 * 11 * 11):
+        for i in range(64):
             location_tokens.append("<loc%d>" % i)
         self.opt_tokenizer.add_special_tokens({"additional_special_tokens": location_tokens})
 
@@ -89,7 +89,7 @@ class Blip2OPT(Blip2Base):
         self.opt_proj = nn.Linear(self.Qformer.config.hidden_size, self.opt_model.config.hidden_size)
 
         self.max_txt_len = max_txt_len
-        self.prompt = "{} Bounding Box: "
+        self.prompt = ""
         prompt_tokens = self.opt_tokenizer(self.prompt, return_tensors="pt")
         self.prompt_length = prompt_tokens.attention_mask.sum(1)
 

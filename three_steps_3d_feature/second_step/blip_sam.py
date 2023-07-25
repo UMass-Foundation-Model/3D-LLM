@@ -51,9 +51,9 @@ if __name__ == '__main__':
                 image = torch.tensor(raw_image[:512, :512]).permute(2, 0, 1).unsqueeze(0).to(device)
     
                 visual_encoder = create_eva_vit_g(512).to(device)
-                output = visual_encoder(image)
-        
-                global_feat = torch.tensor(output)
+                global_feat = visual_encoder(image) # instead of using output we can directly set the global_feat. since visual_encoder is a model that processes images and outputs a tensor
+                # global_feat = torch.tensor(output)
+
                 global_feat = global_feat.half().cuda()
                 global_feat = global_feat[:,:-1,:].resize(1,36,36,1408).permute((0,3,1,2))
                 m = nn.AdaptiveAvgPool2d((1, 1))
@@ -96,7 +96,10 @@ if __name__ == '__main__':
                     roi[x0:x1, y0:y1] = img_roi
                     img_roi = roi.permute(2, 0, 1).unsqueeze(0).to(device)
                     roifeat = visual_encoder(img_roi)
-                    roifeat = torch.tensor(roifeat)
+                    
+                    # roifeat is already a tensor, no need for a new conversion.
+                    # roifeat = torch.tensor(roifeat)
+
                     roifeat = roifeat.half().cuda()
                     roifeat = roifeat[:,:-1,:].resize(1,36,36,1408).permute((0,3,1,2))
                     m = nn.AdaptiveAvgPool2d((1, 1))

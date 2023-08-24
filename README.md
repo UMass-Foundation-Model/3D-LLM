@@ -24,6 +24,18 @@
 </p>
 Preliminary Code.
 
+## Data
+All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing)
+### Pretraining
+#### Object Data
+  Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
+  3D features will be released soon.
+#### Scene Data
+TODO.
+
+### Finetuning
+TODO.
+
 ## Three-step 3D Feature Extraction
 ### First step
 Installation: 

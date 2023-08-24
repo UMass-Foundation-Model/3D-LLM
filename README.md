@@ -80,7 +80,7 @@ Reconstruct 3D feature from multi-view 2D features:
 ```shell
 $ cd ./three_steps_3d_feature/third_step/
 
-$ python sam_mask.py --data_dir_path DATA_DIR_WITH_RGB_IMAGES --depth_dir_path DATA_DIR_WITH_DEPTH_IMAGES --feat_dir_path FEATURE_DIR_FROM_2ND_STEP
+$ python direct_3d.py --data_dir_path DATA_DIR_WITH_RGB_IMAGES --depth_dir_path DATA_DIR_WITH_DEPTH_IMAGES --feat_dir_path FEATURE_DIR_FROM_2ND_STEP
 ```
 
 After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``pcd_feat.pt``) for each room inside the corresponding RGB directory.

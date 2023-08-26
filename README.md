@@ -24,6 +24,63 @@
 </p>
 Preliminary Code.
 
+## Data
+All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing)
+### Pretraining Data
+#### Object Data
+  Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
+
+  For downloading Objaverse data, please refer to [Objaverse website](https://objaverse.allenai.org/).
+  
+  To get 3D features of the Objaverse data, please refer to Step1 and Step3 of 3DLanguage Data generation - ChatCaptioner based
+#### Scene Data
+TODO.
+
+### Finetuning Data
+TODO.
+
+## 3DLanguage Data Generation
+
+### ChatCaptioner based 
+#### Step1: render images from different views of a scene
+Follow the instruction in ``3DLanguage_data/ChatCaptioner_based/objaverse_render/README.md`` for installation. 
+
+The following code will render images of a objaverse scene (e.g. f6e9ec5953854dff94176c36b877c519). The rendered images will be saved at ``3DLanguage_data/ChatCaptioner_based/objaverse_render/output``.
+(Please refer to ``3DLanguage_data/ChatCaptioner_based/objaverse_render/README.md`` for more details about the command)
+
+```shell
+$ cd ./3DLanguage_data/ChatCaptioner_based/objaverse_render
+
+$ {path/to/blender} -b -P render.py -noaudio --disable-crash-handler -- --uid f6e9ec5953854dff94176c36b877c519
+
+```
+
+#### Step2: generate caption for this objaverse scene
+Installation: 
+
+Please follow [ChatCaptioner](https://github.com/Vision-CAIR/ChatCaptioner) to install the environment/
+
+
+The following code will read the rended images of an objaverse scene (e.g., f6e9ec5953854dff94176c36b877c519) and generate scene caption at ``3DLanguage_data/ChatCaptioner_based/output``
+
+#### Step3: 3D feature construction from rendered images
+TODO
+
+
+```shell
+$ cd ./3DLanguage_data/ChatCaptioner_based
+
+$ python chatcaption.py --specific_scene f6e9ec5953854dff94176c36b877c519
+```
+
+
+
+### Box-Demonstration-Instruction based
+TODO
+
+### Revision based
+TODO
+
 ## Three-step 3D Feature Extraction
 ### First step
 Installation: 
@@ -86,46 +143,6 @@ $ python sam_mask.py --data_dir_path DATA_DIR_WITH_RGB_IMAGES --depth_dir_path D
 After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``pcd_feat.pt``) for each room inside the corresponding RGB directory.
 ``pcd_pos.pt`` contains the point positions of the 3D point cloud (shape: ``N * 3``). ``pcd_feat.pt`` contains the point features of the 3D point cloud (shape: ``N * n_dim``).
 ``N`` is the number of sampled points in the point cloud (default: 300000) and ``n_dim`` is the feature dimension (1024 for CLIP feature, 1408 for BLIP feature).
-
-## 3DLanguage Data Generation
-
-### ChatCaptioner based 
-#### Step1: render images from different views of a scene
-Follow the instruction in ``3DLanguage_data/ChatCaptioner_based/objaverse_render/README.md`` for installation. 
-
-The following code will render images of a objaverse scene (e.g. f6e9ec5953854dff94176c36b877c519). The rendered images will be saved at ``3DLanguage_data/ChatCaptioner_based/objaverse_render/output``.
-(Please refer to ``3DLanguage_data/ChatCaptioner_based/objaverse_render/README.md`` for more details about the command)
-
-```shell
-$ cd ./3DLanguage_data/ChatCaptioner_based/objaverse_render
-
-$ {path/to/blender} -b -P render.py -noaudio --disable-crash-handler -- --uid f6e9ec5953854dff94176c36b877c519
-
-```
-
-#### Step2: generate caption for this objaverse scene
-Installation: 
-
-Please follow [ChatCaptioner](https://github.com/Vision-CAIR/ChatCaptioner) to install the environment/
-
-
-The following code will read the rended images of an objaverse scene (e.g., f6e9ec5953854dff94176c36b877c519) and generate scene caption at ``3DLanguage_data/ChatCaptioner_based/output``
-
-
-```shell
-$ cd ./3DLanguage_data/ChatCaptioner_based
-
-$ python chatcaption.py --specific_scene f6e9ec5953854dff94176c36b877c519
-```
-
-
-
-### Box-Demonstration-Instruction based
-TODO
-
-### Revision based
-TODO
-
 
 ## 3D-LLM_BLIP2-based
 ### Installation

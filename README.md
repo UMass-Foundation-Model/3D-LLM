@@ -33,6 +33,8 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
   For downloading Objaverse data, please refer to [Objaverse website](https://objaverse.allenai.org/).
   
   To get 3D features of the Objaverse data, please refer to Step1 and Step3 of 3DLanguage Data generation - ChatCaptioner based
+
+  We will also release a small set of Objaverse 3D features
 #### Scene Data
 TODO.
 

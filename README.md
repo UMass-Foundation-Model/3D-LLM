@@ -28,13 +28,13 @@ Preliminary Code.
 All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing)
 ### Pretraining Data
 #### Object Data
-  Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
+  &emsp;Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
 
-  For downloading Objaverse data, please refer to [Objaverse website](https://objaverse.allenai.org/).
+  &emsp;For downloading Objaverse data, please refer to [Objaverse website](https://objaverse.allenai.org/).
   
-  To get 3D features of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
+  &emsp;To get 3D features of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
 
-  We will also release a small set of Objaverse 3D features
+  &emsp;We will also release a small set of Objaverse 3D features
 #### Scene Data
 TODO.
 

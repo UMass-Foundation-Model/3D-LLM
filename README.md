@@ -65,15 +65,16 @@ Please follow [ChatCaptioner](https://github.com/Vision-CAIR/ChatCaptioner) to i
 
 The following code will read the rended images of an objaverse scene (e.g., f6e9ec5953854dff94176c36b877c519) and generate scene caption at ``3DLanguage_data/ChatCaptioner_based/output``
 
-#### Step3: 3D feature construction from rendered images
-TODO
-
-
 ```shell
 $ cd ./3DLanguage_data/ChatCaptioner_based
 
 $ python chatcaption.py --specific_scene f6e9ec5953854dff94176c36b877c519
 ```
+
+#### Step3: 3D feature construction from rendered images
+TODO
+
+
 
 
 

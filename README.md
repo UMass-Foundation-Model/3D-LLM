@@ -32,7 +32,7 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
 
   &emsp;For downloading Objaverse data, please refer to [Objaverse website](https://objaverse.allenai.org/).
   
-  &emsp;To get 3D features of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
+  &emsp;To get 3D features and point clouds of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
 
   &emsp;We will also release a small set of Objaverse 3D features
 #### Scene Data

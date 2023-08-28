@@ -42,7 +42,6 @@ class CaptionDataset(BaseDataset, __DisplMixin):
                 n += 1
 
     def __getitem__(self, index):
-
         # TODO this assumes image input, not general enough
         ann = self.annotation[index]
 
@@ -69,7 +68,6 @@ class CaptionEvalDataset(BaseDataset, __DisplMixin):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         image_path = os.path.join(self.vis_root, ann["image"])

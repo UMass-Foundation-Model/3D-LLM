@@ -98,16 +98,8 @@ class VQA:
                 )
             else:
                 anns = self.dataset["annotations"]
-            anns = (
-                anns
-                if len(quesTypes) == 0
-                else [ann for ann in anns if ann["question_type"] in quesTypes]
-            )
-            anns = (
-                anns
-                if len(ansTypes) == 0
-                else [ann for ann in anns if ann["answer_type"] in ansTypes]
-            )
+            anns = anns if len(quesTypes) == 0 else [ann for ann in anns if ann["question_type"] in quesTypes]
+            anns = anns if len(ansTypes) == 0 else [ann for ann in anns if ann["answer_type"] in ansTypes]
         ids = [ann["question_id"] for ann in anns]
         return ids
 
@@ -127,21 +119,11 @@ class VQA:
             anns = self.dataset["annotations"]
         else:
             if not len(quesIds) == 0:
-                anns = sum(
-                    [self.qa[quesId] for quesId in quesIds if quesId in self.qa], []
-                )
+                anns = sum([self.qa[quesId] for quesId in quesIds if quesId in self.qa], [])
             else:
                 anns = self.dataset["annotations"]
-            anns = (
-                anns
-                if len(quesTypes) == 0
-                else [ann for ann in anns if ann["question_type"] in quesTypes]
-            )
-            anns = (
-                anns
-                if len(ansTypes) == 0
-                else [ann for ann in anns if ann["answer_type"] in ansTypes]
-            )
+            anns = anns if len(quesTypes) == 0 else [ann for ann in anns if ann["question_type"] in quesTypes]
+            anns = anns if len(ansTypes) == 0 else [ann for ann in anns if ann["answer_type"] in ansTypes]
         ids = [ann["image_id"] for ann in anns]
         return ids
 
@@ -202,9 +184,7 @@ class VQA:
             ann["image_id"] = qaAnn["image_id"]
             ann["question_type"] = qaAnn["question_type"]
             ann["answer_type"] = qaAnn["answer_type"]
-        print(
-            "DONE (t=%0.2fs)" % ((datetime.datetime.utcnow() - time_t).total_seconds())
-        )
+        print("DONE (t=%0.2fs)" % ((datetime.datetime.utcnow() - time_t).total_seconds()))
 
         res.dataset["annotations"] = anns
         res.createIndex()

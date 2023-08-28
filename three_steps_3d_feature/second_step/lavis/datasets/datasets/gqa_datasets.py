@@ -66,7 +66,7 @@ class GQAEvalDataset(VQAEvalDataset, __DisplMixin):
         self.annotation = json.load(open(ann_paths[0]))
 
         ## TODO: support inference method == 'ranking'
-        answer_list_path = ann_paths[1] if len(ann_paths) > 1 else ''
+        answer_list_path = ann_paths[1] if len(ann_paths) > 1 else ""
         if os.path.exists(answer_list_path):
             self.answer_list = json.load(open(answer_list_path))
         else:

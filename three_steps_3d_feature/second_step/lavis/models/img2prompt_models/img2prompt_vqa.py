@@ -20,7 +20,6 @@ from lavis.models.blip_models.blip_image_text_matching import compute_gradcam
 open_pos = ["NOUN", "VERB", "ADJ", "ADV", "NUM"]
 
 
-
 @registry.register_model("img2prompt_vqa")
 class Img2PromptVQA(BaseModel):
     """
@@ -89,9 +88,7 @@ class Img2PromptVQA(BaseModel):
             )
 
         gradcams = [gradcam_[1] for gradcam_ in gradcams]
-        samples["gradcams"] = torch.stack(gradcams).reshape(
-            samples["image"].size(0), -1
-        )
+        samples["gradcams"] = torch.stack(gradcams).reshape(samples["image"].size(0), -1)
 
         return samples
 
@@ -123,9 +120,7 @@ class Img2PromptVQA(BaseModel):
                 mode="text",
             )
             image_feat = F.normalize(self.vision_proj(image_embeds[:, 0, :]), dim=-1)
-            text_feat = F.normalize(
-                self.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1
-            )
+            text_feat = F.normalize(self.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1)
 
             sim = image_feat @ text_feat.t()
             return sim
@@ -177,31 +172,23 @@ class Img2PromptVQA(BaseModel):
                     ).reshape(encoder_out.size(0), -1)
                     + 1
                 )
-                patch_id = (
-                    patch_id.sort(dim=1)
-                    .values.unsqueeze(-1)
-                    .expand(-1, -1, encoder_out.size(2))
-                )
+                patch_id = patch_id.sort(dim=1).values.unsqueeze(-1).expand(-1, -1, encoder_out.size(2))
                 encoder_out_sample = torch.gather(encoder_out, 1, patch_id)
                 encoder_out_samples.append(encoder_out_sample)
 
             stacked = torch.stack(encoder_out_samples, dim=1)
-            image_embeds = torch.flatten(
-                stacked, start_dim=0, end_dim=1
-            )  # (bsz*num_seq, num_patch, dim)
+            image_embeds = torch.flatten(stacked, start_dim=0, end_dim=1)  # (bsz*num_seq, num_patch, dim)
 
-            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-                self.image_captioning_model.device
-            )
+            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.image_captioning_model.device)
             model_kwargs = {
                 "encoder_hidden_states": image_embeds,
                 "encoder_attention_mask": image_atts,
             }
 
             prompt = [self.image_captioning_model.prompt] * image_embeds.size(0)
-            prompt = self.image_captioning_model.tokenizer(
-                prompt, return_tensors="pt"
-            ).to(self.image_captioning_model.device)
+            prompt = self.image_captioning_model.tokenizer(prompt, return_tensors="pt").to(
+                self.image_captioning_model.device
+            )
             prompt.input_ids[:, 0] = self.image_captioning_model.tokenizer.bos_token_id
             prompt.input_ids = prompt.input_ids[:, :-1]
 
@@ -223,9 +210,7 @@ class Img2PromptVQA(BaseModel):
                 image_embeds, image_atts, encoder_input_ids=decoder_out
             )  # caption filter
 
-            outputs = self.image_captioning_model.tokenizer.batch_decode(
-                decoder_out, skip_special_tokens=True
-            )
+            outputs = self.image_captioning_model.tokenizer.batch_decode(decoder_out, skip_special_tokens=True)
 
             for counter, output in enumerate(outputs):
                 ind = counter // num_captions
@@ -233,9 +218,7 @@ class Img2PromptVQA(BaseModel):
                     caption = output[len(self.image_captioning_model.prompt) :]
                     overlap_caption = [1 for caps in captions[ind] if caption in caps]
                     # print(itm_outputs)
-                    if (
-                        len(overlap_caption) == 0 and itm_outputs[counter] >= 0.5
-                    ):  # image filter
+                    if len(overlap_caption) == 0 and itm_outputs[counter] >= 0.5:  # image filter
                         captions[ind].append(caption)
 
             min_num_captions = min([len(i) for i in captions])
@@ -265,7 +248,6 @@ class Img2PromptVQA(BaseModel):
                             ans_to_cap_dict[token.text.lower()].append(cap_idx)
                     answers.append(token.text)
             for ent in cap.ents:
-
                 if ent.text not in answers:
                     if ent.text.lower() not in ans_to_cap_dict:
                         ans_to_cap_dict[ent.text.lower()] = [cap_idx]
@@ -291,16 +273,10 @@ class Img2PromptVQA(BaseModel):
 
         contexts_for_question_generation = []
         answers = []
-        for ans in real_answers[
-            :num_question_generation
-        ]:  # Generate questions for 30 answers with max frequencies.
-            contexts_for_question_generation.append(
-                "answer: %s  context: %s." % (ans, cap_use)
-            )
+        for ans in real_answers[:num_question_generation]:  # Generate questions for 30 answers with max frequencies.
+            contexts_for_question_generation.append("answer: %s  context: %s." % (ans, cap_use))
             answers.append(ans)
-        contexts_for_question_generation.append(
-            "answer: %s  context: %s." % ("yes.", cap_use)
-        )
+        contexts_for_question_generation.append("answer: %s  context: %s." % ("yes.", cap_use))
         answers.append("yes.")
         return contexts_for_question_generation, answers, ans_to_cap_dict
 
@@ -329,9 +305,7 @@ class Img2PromptVQA(BaseModel):
                 num_beams=3,
                 max_length=30,
             )
-            questions = self.question_generation_tokenizer.batch_decode(
-                outputs, skip_special_tokens=True
-            )
+            questions = self.question_generation_tokenizer.batch_decode(outputs, skip_special_tokens=True)
             outputs_list += questions
             cur_b += true_input_size
         questions = outputs_list
@@ -349,9 +323,7 @@ class Img2PromptVQA(BaseModel):
         Context_Prompt = ""
         mycontexts_id = []
         for idx in range(num_caps_per_img):
-            cap_id_list = ans_dict_queid.get(
-                answers[(len(answers) - 1 - idx) % len(answers)][:-1].lower(), [0]
-            )
+            cap_id_list = ans_dict_queid.get(answers[(len(answers) - 1 - idx) % len(answers)][:-1].lower(), [0])
             for cap_id in cap_id_list:
                 if cap_id not in mycontexts_id:
                     Context_Prompt += caption[cap_id]
@@ -360,9 +332,7 @@ class Img2PromptVQA(BaseModel):
         samples["Context_Prompt"] = Context_Prompt
         return Context_Prompt
 
-    def create_task_prompt(
-        self, samples, question_type="neural", num_question_per_img=30
-    ):
+    def create_task_prompt(self, samples, question_type="neural", num_question_per_img=30):
         syn_question_queid = samples["questions"]
         syn_ans_queid = samples["answers"]
         Task_Prompt = ""
@@ -371,9 +341,7 @@ class Img2PromptVQA(BaseModel):
             #     qa_idx = random.randint(0, len(syn_question_queid) - 1)
             # else:
             qa_idx = idx
-            if (
-                question_type != "rule" and num_question_per_img > 0 and idx < 1
-            ):  ## yes and no questions for vqav2
+            if question_type != "rule" and num_question_per_img > 0 and idx < 1:  ## yes and no questions for vqav2
                 # Task_Prompt += "Question:"
                 # Task_Prompt += syn_question_queid_next[-1]
                 # Task_Prompt += '\n'
@@ -408,17 +376,11 @@ class Img2PromptVQA(BaseModel):
                 Task_Prompt += "Question:"
                 doc = self.nlp(syn_ans_queid[(qa_idx) % len(syn_ans_queid)][:-1].lower())
                 if doc[-1].pos_ == "NOUN":
-                    Task_Prompt += Noun_Questions[
-                        random.randint(0, len(Noun_Questions) - 1)
-                    ]
+                    Task_Prompt += Noun_Questions[random.randint(0, len(Noun_Questions) - 1)]
                 elif doc[-1].pos_ == "VERB":
-                    Task_Prompt += Verb_Questions[
-                        random.randint(0, len(Verb_Questions) - 1)
-                    ]
+                    Task_Prompt += Verb_Questions[random.randint(0, len(Verb_Questions) - 1)]
                 elif doc[-1].pos_ == "ADJ":
-                    Task_Prompt += Adj_Questions[
-                        random.randint(0, len(Adj_Questions) - 1)
-                    ]
+                    Task_Prompt += Adj_Questions[random.randint(0, len(Adj_Questions) - 1)]
 
                 Task_Prompt += "\n"
 
@@ -440,9 +402,7 @@ class Img2PromptVQA(BaseModel):
 
         Context_Prompt = self.create_context_prompt(samples, num_caps_per_img)
 
-        Task_Prompt = self.create_task_prompt(
-            samples, question_type, num_question_per_img
-        )
+        Task_Prompt = self.create_task_prompt(samples, question_type, num_question_per_img)
 
         Img2Prompt = (
             Prompt
@@ -557,12 +517,8 @@ class Img2PromptVQA(BaseModel):
         image_question_matching_model = itm_cls.from_config(itm_config)
         image_captioning_model = cap_cls.from_config(cap_config)
 
-        question_generation_tokenizer = T5Tokenizer.from_pretrained(
-            "google/t5-large-lm-adapt"
-        )
-        question_generation_model = T5ForConditionalGeneration.from_pretrained(
-            "google/t5-large-lm-adapt"
-        )
+        question_generation_tokenizer = T5Tokenizer.from_pretrained("google/t5-large-lm-adapt")
+        question_generation_model = T5ForConditionalGeneration.from_pretrained("google/t5-large-lm-adapt")
         cached_file = download_cached_file(
             "https://storage.googleapis.com/sfr-vision-language-research/LAVIS/projects/img2prompt/T5_large_QG.pth",
             check_hash=False,

@@ -45,9 +45,7 @@ def load_state_dict(checkpoint_path, use_ema=False):
             state_dict = new_state_dict
         else:
             state_dict = checkpoint
-        logging.info(
-            "Loaded {} from checkpoint '{}'".format(state_dict_key, checkpoint_path)
-        )
+        logging.info("Loaded {} from checkpoint '{}'".format(state_dict_key, checkpoint_path))
         return state_dict
     else:
         logging.error("No checkpoint found at '{}'".format(checkpoint_path))
@@ -133,10 +131,7 @@ def load_pretrained(
 
     if in_chans == 1:
         conv1_name = cfg["first_conv"]
-        logging.info(
-            "Converting first conv (%s) pretrained weights from 3 to 1 channel"
-            % conv1_name
-        )
+        logging.info("Converting first conv (%s) pretrained weights from 3 to 1 channel" % conv1_name)
         conv1_weight = state_dict[conv1_name + ".weight"]
         conv1_type = conv1_weight.dtype
         conv1_weight = conv1_weight.float()
@@ -157,15 +152,11 @@ def load_pretrained(
         conv1_weight = conv1_weight.float()
         O, I, J, K = conv1_weight.shape
         if I != 3:
-            logging.warning(
-                "Deleting first conv (%s) from pretrained weights." % conv1_name
-            )
+            logging.warning("Deleting first conv (%s) from pretrained weights." % conv1_name)
             del state_dict[conv1_name + ".weight"]
             strict = False
         else:
-            logging.info(
-                "Repeating first conv (%s) weights in channel dim." % conv1_name
-            )
+            logging.info("Repeating first conv (%s) weights in channel dim." % conv1_name)
             repeat = int(math.ceil(in_chans / 3))
             conv1_weight = conv1_weight.repeat(1, repeat, 1, 1)[:, :in_chans, :, :]
             conv1_weight *= 3 / float(in_chans)
@@ -187,25 +178,19 @@ def load_pretrained(
         strict = False
 
     ## Resizing the positional embeddings in case they don't match
-    logging.info(
-        f"Resizing spatial position embedding from {state_dict['pos_embed'].size(1)} to {num_patches + 1}"
-    )
+    logging.info(f"Resizing spatial position embedding from {state_dict['pos_embed'].size(1)} to {num_patches + 1}")
     if num_patches + 1 != state_dict["pos_embed"].size(1):
         pos_embed = state_dict["pos_embed"]
         cls_pos_embed = pos_embed[0, 0, :].unsqueeze(0).unsqueeze(1)
         other_pos_embed = pos_embed[0, 1:, :].unsqueeze(0).transpose(1, 2)
-        new_pos_embed = F.interpolate(
-            other_pos_embed, size=(num_patches), mode="nearest"
-        )
+        new_pos_embed = F.interpolate(other_pos_embed, size=(num_patches), mode="nearest")
         new_pos_embed = new_pos_embed.transpose(1, 2)
         new_pos_embed = torch.cat((cls_pos_embed, new_pos_embed), 1)
         state_dict["pos_embed"] = new_pos_embed
 
     ## Resizing time embeddings in case they don't match
     if "time_embed" in state_dict and num_frames != state_dict["time_embed"].size(1):
-        logging.info(
-            f"Resizing temporal position embedding from {state_dict['time_embed'].size(1)} to {num_frames}"
-        )
+        logging.info(f"Resizing temporal position embedding from {state_dict['time_embed'].size(1)} to {num_frames}")
         time_embed = state_dict["time_embed"].transpose(1, 2)
         new_time_embed = F.interpolate(time_embed, size=(num_frames), mode="nearest")
         state_dict["time_embed"] = new_time_embed.transpose(1, 2)
@@ -244,9 +229,7 @@ def load_pretrained_imagenet(
     import timm
 
     logging.info(f"Loading vit_base_patch16_224 checkpoints.")
-    loaded_state_dict = timm.models.vision_transformer.vit_base_patch16_224(
-        pretrained=True
-    ).state_dict()
+    loaded_state_dict = timm.models.vision_transformer.vit_base_patch16_224(pretrained=True).state_dict()
 
     del loaded_state_dict["head.weight"]
     del loaded_state_dict["head.bias"]
@@ -289,9 +272,7 @@ def load_pretrained_imagenet(
     logging.info("Keys in model but not in loaded:")
     logging.info(f"In total {len(model_not_in_load)}, {sorted(model_not_in_load)}")
     logging.info("Keys in model and loaded, but shape mismatched:")
-    logging.info(
-        f"In total {len(mismatched_shape_keys)}, {sorted(mismatched_shape_keys)}"
-    )
+    logging.info(f"In total {len(mismatched_shape_keys)}, {sorted(mismatched_shape_keys)}")
 
     model.load_state_dict(toload, strict=False)
 
@@ -311,15 +292,12 @@ def load_pretrained_kinetics(
         logging.warning("Pretrained model URL is invalid, using random initialization.")
         return
 
-    assert (
-        len(pretrained_model) > 0
-    ), "Path to pre-trained Kinetics weights not provided."
+    assert len(pretrained_model) > 0, "Path to pre-trained Kinetics weights not provided."
 
     state_dict = load_state_dict(pretrained_model)
 
     classifier_name = cfg["classifier"]
     if ignore_classifier:
-
         classifier_weight_key = classifier_name + ".weight"
         classifier_bias_key = classifier_name + ".bias"
 
@@ -327,9 +305,7 @@ def load_pretrained_kinetics(
         state_dict[classifier_bias_key] = model.state_dict()[classifier_bias_key]
 
     else:
-        raise NotImplementedError(
-            "[dxli] Not supporting loading Kinetics-pretrained ckpt with classifier."
-        )
+        raise NotImplementedError("[dxli] Not supporting loading Kinetics-pretrained ckpt with classifier.")
 
     ## Resizing the positional embeddings in case they don't match
     if num_patches + 1 != state_dict["pos_embed"].size(1):
@@ -338,9 +314,7 @@ def load_pretrained_kinetics(
 
     ## Resizing time embeddings in case they don't match
     if "time_embed" in state_dict and num_frames != state_dict["time_embed"].size(1):
-        state_dict["time_embed"] = resize_temporal_embedding(
-            state_dict, "time_embed", num_frames
-        )
+        state_dict["time_embed"] = resize_temporal_embedding(state_dict, "time_embed", num_frames)
 
     ## Loading the weights
     try:
@@ -351,9 +325,7 @@ def load_pretrained_kinetics(
 
 
 def resize_spatial_embedding(state_dict, key, num_patches):
-    logging.info(
-        f"Resizing spatial position embedding from {state_dict[key].size(1)} to {num_patches + 1}"
-    )
+    logging.info(f"Resizing spatial position embedding from {state_dict[key].size(1)} to {num_patches + 1}")
 
     pos_embed = state_dict[key]
 
@@ -368,9 +340,7 @@ def resize_spatial_embedding(state_dict, key, num_patches):
 
 
 def resize_temporal_embedding(state_dict, key, num_frames):
-    logging.info(
-        f"Resizing temporal position embedding from {state_dict[key].size(1)} to {num_frames}"
-    )
+    logging.info(f"Resizing temporal position embedding from {state_dict[key].size(1)} to {num_frames}")
 
     time_embed = state_dict[key].transpose(1, 2)
     new_time_embed = F.interpolate(time_embed, size=(num_frames), mode="nearest")
@@ -395,6 +365,4 @@ def detach_variable(inputs):
 
 def check_backward_validity(inputs):
     if not any(inp.requires_grad for inp in inputs):
-        warnings.warn(
-            "None of the inputs have requires_grad=True. Gradients will be None"
-        )
+        warnings.warn("None of the inputs have requires_grad=True. Gradients will be None")

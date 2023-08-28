@@ -32,12 +32,8 @@ def crop(clip, i, j, h, w):
 
 def resize(clip, target_size, interpolation_mode):
     if len(target_size) != 2:
-        raise ValueError(
-            f"target size should be tuple (height, width), instead got {target_size}"
-        )
-    return torch.nn.functional.interpolate(
-        clip, size=target_size, mode=interpolation_mode, align_corners=False
-    )
+        raise ValueError(f"target size should be tuple (height, width), instead got {target_size}")
+    return torch.nn.functional.interpolate(clip, size=target_size, mode=interpolation_mode, align_corners=False)
 
 
 def resized_crop(clip, i, j, h, w, size, interpolation_mode="bilinear"):
@@ -84,9 +80,7 @@ def to_tensor(clip):
     """
     _is_tensor_video_clip(clip)
     if not clip.dtype == torch.uint8:
-        raise TypeError(
-            "clip tensor should have data type uint8. Got %s" % str(clip.dtype)
-        )
+        raise TypeError("clip tensor should have data type uint8. Got %s" % str(clip.dtype))
     return clip.float().permute(3, 0, 1, 2) / 255.0
 
 

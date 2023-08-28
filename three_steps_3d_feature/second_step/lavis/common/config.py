@@ -36,9 +36,7 @@ class Config:
         # self._validate_runner_config(runner_config)
 
         # Override the default configuration with user options.
-        self.config = OmegaConf.merge(
-            runner_config, model_config, dataset_config, user_config
-        )
+        self.config = OmegaConf.merge(runner_config, model_config, dataset_config, user_config)
 
     def _validate_runner_config(self, runner_config):
         """
@@ -88,9 +86,7 @@ class Config:
     def build_dataset_config(config):
         datasets = config.get("datasets", None)
         if datasets is None:
-            raise KeyError(
-                "Expecting 'datasets' as the root key for dataset configuration."
-            )
+            raise KeyError("Expecting 'datasets' as the root key for dataset configuration.")
 
         dataset_config = OmegaConf.create()
 
@@ -98,9 +94,7 @@ class Config:
             builder_cls = registry.get_builder_class(dataset_name)
 
             dataset_config_type = datasets[dataset_name].get("type", "default")
-            dataset_config_path = builder_cls.default_config_path(
-                type=dataset_config_type
-            )
+            dataset_config_path = builder_cls.default_config_path(type=dataset_config_type)
 
             # hiararchy override, customized config > default config
             dataset_config = OmegaConf.merge(
@@ -239,9 +233,7 @@ class ConfigValidator:
                     raise ValueError(f"{k} is not a valid {self.arguments[k].type}.")
 
             if self.arguments[k].choices is not None:
-                assert (
-                    v in self.arguments[k].choices
-                ), f"""{k} must be one of {self.arguments[k].choices}."""
+                assert v in self.arguments[k].choices, f"""{k} must be one of {self.arguments[k].choices}."""
 
         return config
 

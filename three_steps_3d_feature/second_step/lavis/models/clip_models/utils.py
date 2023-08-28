@@ -28,9 +28,7 @@ def freeze_batch_norm_2d(module, module_match={}, name=""):
     is_match = True
     if module_match:
         is_match = name in module_match
-    if is_match and isinstance(
-        module, (nn.modules.batchnorm.BatchNorm2d, nn.modules.batchnorm.SyncBatchNorm)
-    ):
+    if is_match and isinstance(module, (nn.modules.batchnorm.BatchNorm2d, nn.modules.batchnorm.SyncBatchNorm)):
         res = FrozenBatchNorm2d(module.num_features)
         res.num_features = module.num_features
         res.affine = module.affine

@@ -38,11 +38,7 @@ class ImageNetBuilder(BaseDatasetBuilder):
 
             is_train = split == "train"
 
-            vis_processor = (
-                self.vis_processors["train"]
-                if is_train
-                else self.vis_processors["eval"]
-            )
+            vis_processor = self.vis_processors["train"] if is_train else self.vis_processors["eval"]
 
             vis_path = os.path.join(vis_info.storage, split)
 

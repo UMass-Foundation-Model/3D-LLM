@@ -119,17 +119,13 @@ class AlbefFeatureExtractor(AlbefBase):
         image_features, text_features = None, None
 
         if "image" in mode or "multimodal" in mode:
-            assert (
-                image is not None
-            ), "image must be provided if mode is 'image' or 'multimodal'"
+            assert image is not None, "image must be provided if mode is 'image' or 'multimodal'"
 
             image_embeds = self.visual_encoder.forward_features(image)
             image_features = F.normalize(self.vision_proj(image_embeds), dim=-1)
 
         if "text" in mode or "multimodal" in mode:
-            assert (
-                caption is not None
-            ), "text must be provided if mode is 'text' or 'multimodal'"
+            assert caption is not None, "text must be provided if mode is 'text' or 'multimodal'"
 
             text = self.tokenizer(
                 caption,
@@ -147,9 +143,7 @@ class AlbefFeatureExtractor(AlbefBase):
             text_features = F.normalize(self.text_proj(text_embeds), dim=-1)
 
         if "multimodal" in mode:
-            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-                self.device
-            )
+            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.device)
 
             # forward the positve image-text pair
             output = self.text_encoder.bert(
@@ -174,13 +168,9 @@ class AlbefFeatureExtractor(AlbefBase):
     @classmethod
     def from_config(cls, cfg=None):
         image_encoder = VisionTransformerEncoder.from_config(cfg, from_pretrained=True)
-        config_text_encoder = BertConfig.from_json_file(
-            get_abs_path(cfg["med_config_path"])
-        )
+        config_text_encoder = BertConfig.from_json_file(get_abs_path(cfg["med_config_path"]))
         config_text_encoder.fusion_layer = 6
-        text_encoder = BertForMaskedLM.from_pretrained(
-            "bert-base-uncased", config=config_text_encoder
-        )
+        text_encoder = BertForMaskedLM.from_pretrained("bert-base-uncased", config=config_text_encoder)
 
         embed_dim = cfg.get("embed_dim", 256)
         max_txt_len = cfg.get("max_txt_len", 30)
@@ -195,9 +185,7 @@ class AlbefFeatureExtractor(AlbefBase):
         # load pre-trained weights
         pretrain_path = cfg.get("pretrained", None)
         if pretrain_path is not None:
-            msg = model.load_from_pretrained(
-                url_or_filename=pretrain_path, rename_text_keys=False
-            )
+            msg = model.load_from_pretrained(url_or_filename=pretrain_path, rename_text_keys=False)
         else:
             warnings.warn("No pretrained weights are loaded.")
 

@@ -18,12 +18,11 @@ from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
 
 @registry.register_model("pnp_unifiedqav2_fid")
 class PNPUnifiedQAv2FiD(T5ForConditionalGeneration, BaseModel):
-
     PRETRAINED_MODEL_CONFIG_DICT = {}
 
     def __init__(self, config, model_path):
         super().__init__(config)
-        
+
         self.tokenizer = T5Tokenizer.from_pretrained(model_path)
 
     def forward(self, input_ids=None, attention_mask=None, **kwargs):
@@ -34,11 +33,7 @@ class PNPUnifiedQAv2FiD(T5ForConditionalGeneration, BaseModel):
         if attention_mask != None:
             attention_mask = attention_mask.view(attention_mask.size(0), -1)
 
-        return super().forward(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            **kwargs
-        )
+        return super().forward(input_ids=input_ids, attention_mask=attention_mask, **kwargs)
 
     def generate(self, input_ids, attention_mask, num_beams=1, min_length=0, max_length=20):
         self.encoder.num_contexts = input_ids.size(1)
@@ -48,7 +43,7 @@ class PNPUnifiedQAv2FiD(T5ForConditionalGeneration, BaseModel):
             attention_mask=attention_mask.view(attention_mask.size(0), -1),
             num_beams=num_beams,
             min_length=min_length,
-            max_length=max_length
+            max_length=max_length,
         )
 
     def load_unifiedqa(self, state_dict):
@@ -57,7 +52,7 @@ class PNPUnifiedQAv2FiD(T5ForConditionalGeneration, BaseModel):
 
     @classmethod
     def from_config(cls, cfg):
-        model_path = cfg.get('pretrained')
+        model_path = cfg.get("pretrained")
         t5_config_path = get_abs_path(cfg.get("t5_config_path"))
         t5_config = T5Config.from_json_file(t5_config_path)
         model = cls(t5_config, model_path)
@@ -67,7 +62,6 @@ class PNPUnifiedQAv2FiD(T5ForConditionalGeneration, BaseModel):
 
 
 class T5EncoderWrapper(torch.nn.Module):
-
     def __init__(self, encoder):
         super().__init__()
 
@@ -79,9 +73,9 @@ class T5EncoderWrapper(torch.nn.Module):
     def forward(self, input_ids=None, attention_mask=None, **kwargs):
         bsz, total_length = input_ids.shape
         context_length = total_length // self.num_contexts
-        input_ids = input_ids.view(bsz*self.num_contexts, context_length)
-        attention_mask = attention_mask.view(bsz*self.num_contexts, context_length)
+        input_ids = input_ids.view(bsz * self.num_contexts, context_length)
+        attention_mask = attention_mask.view(bsz * self.num_contexts, context_length)
         outputs = self.encoder(input_ids, attention_mask, **kwargs)
-        outputs = (outputs[0].view(bsz, self.num_contexts*context_length, -1), ) + outputs[1:]
+        outputs = (outputs[0].view(bsz, self.num_contexts * context_length, -1),) + outputs[1:]
 
         return outputs

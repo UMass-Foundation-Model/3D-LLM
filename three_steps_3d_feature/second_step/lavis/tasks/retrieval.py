@@ -52,7 +52,6 @@ class RetrievalTask(BaseTask):
     @staticmethod
     @torch.no_grad()
     def _report_metrics(scores_i2t, scores_t2i, txt2img, img2txt):
-
         # Images->Text
         ranks = np.zeros(scores_i2t.shape[0])
         for index, score in enumerate(scores_i2t):
@@ -100,8 +99,6 @@ class RetrievalTask(BaseTask):
             "r_mean": r_mean,
             "agg_metrics": agg_metrics,
         }
-        with open(
-            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-        ) as f:
+        with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
             f.write(json.dumps(eval_result) + "\n")
         return eval_result

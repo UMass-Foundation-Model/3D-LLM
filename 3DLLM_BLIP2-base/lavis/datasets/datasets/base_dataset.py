@@ -44,7 +44,6 @@ class ConcatDataset(ConcatDataset):
         super().__init__(datasets)
 
     def collater(self, samples):
-
         all_keys = set()
         for s in samples:
             all_keys.update(s)

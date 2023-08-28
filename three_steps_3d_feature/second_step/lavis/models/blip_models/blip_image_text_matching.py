@@ -60,9 +60,7 @@ class BlipITM(BlipBase):
         caption = samples["text_input"]
 
         image_embeds = self.visual_encoder.forward_features(image)
-        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-            image.device
-        )
+        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(image.device)
 
         text = self.tokenizer(
             caption,
@@ -92,36 +90,37 @@ class BlipITM(BlipBase):
                 mode="text",
             )
             image_feat = F.normalize(self.vision_proj(image_embeds[:, 0, :]), dim=-1)
-            text_feat = F.normalize(
-                self.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1
-            )
+            text_feat = F.normalize(self.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1)
 
             sim = image_feat @ text_feat.t()
             return sim
-    def itm_rank(self, image_embeds, image_atts, encoder_input_ids, match_head='itm'):
+
+    def itm_rank(self, image_embeds, image_atts, encoder_input_ids, match_head="itm"):
         # breakpoint()
         encoder_input_ids = encoder_input_ids.clone()
         encoder_input_ids = encoder_input_ids[:, 3:]
         text_attention_mask = (encoder_input_ids != self.tokenizer.pad_token_id).long()
 
-        if match_head == 'itm':
+        if match_head == "itm":
             # encoder_input_ids = encoder_input_ids.clone()
             encoder_input_ids[:, 0] = self.tokenizer.enc_token_id
-            output = self.text_encoder(encoder_input_ids,
-                                       attention_mask=text_attention_mask,
-                                       encoder_hidden_states=image_embeds,
-                                       encoder_attention_mask=image_atts,
-                                       return_dict=True,
-                                       )
+            output = self.text_encoder(
+                encoder_input_ids,
+                attention_mask=text_attention_mask,
+                encoder_hidden_states=image_embeds,
+                encoder_attention_mask=image_atts,
+                return_dict=True,
+            )
             # print(output.last_hidden_state.shape)
             itm_output = self.itm_head(output.last_hidden_state[:, 0, :])
-            itm_output = F.softmax(itm_output, dim=1)[:,1]
-            return itm_output #, mask, token_length
+            itm_output = F.softmax(itm_output, dim=1)[:, 1]
+            return itm_output  # , mask, token_length
 
-        elif match_head == 'itc':
+        elif match_head == "itc":
             encoder_input_ids[:, 0] = self.tokenizer.cls_token_id
-            text_output = self.text_encoder(encoder_input_ids, attention_mask=text_attention_mask,
-                                            return_dict=True, mode='text')
+            text_output = self.text_encoder(
+                encoder_input_ids, attention_mask=text_attention_mask, return_dict=True, mode="text"
+            )
             image_feat = F.normalize(self.vision_proj(image_embeds[:, 0, :]), dim=-1)
             text_feat = F.normalize(self.text_proj(text_output.last_hidden_state[:, 0, :]), dim=-1)
 
@@ -149,9 +148,7 @@ class BlipITM(BlipBase):
 
 
 def compute_gradcam(model, visual_input, text_input, tokenized_text, block_num=6):
-    model.text_encoder.base_model.base_model.encoder.layer[
-        block_num
-    ].crossattention.self.save_attention = True
+    model.text_encoder.base_model.base_model.encoder.layer[block_num].crossattention.self.save_attention = True
 
     output = model({"image": visual_input, "text_input": text_input}, match_head="itm")
     loss = output[:, 1].sum()
@@ -168,16 +165,11 @@ def compute_gradcam(model, visual_input, text_input, tokenized_text, block_num=6
         grads = model.text_encoder.base_model.base_model.encoder.layer[
             block_num
         ].crossattention.self.get_attn_gradients()
-        cams = model.text_encoder.base_model.base_model.encoder.layer[
-            block_num
-        ].crossattention.self.get_attention_map()
+        cams = model.text_encoder.base_model.base_model.encoder.layer[block_num].crossattention.self.get_attention_map()
 
         # assume using vit with 576 num image patch
         cams = cams[:, :, :, 1:].reshape(visual_input.size(0), 12, -1, 24, 24) * mask
-        grads = (
-            grads[:, :, :, 1:].clamp(0).reshape(visual_input.size(0), 12, -1, 24, 24)
-            * mask
-        )
+        grads = grads[:, :, :, 1:].clamp(0).reshape(visual_input.size(0), 12, -1, 24, 24) * mask
 
         gradcams = cams * grads
         gradcam_list = []
@@ -189,11 +181,10 @@ def compute_gradcam(model, visual_input, text_input, tokenized_text, block_num=6
             gradcam = torch.cat(
                 (
                     gradcam[0:1, :],
-                    gradcam[1 : token_length_ + 1, :].sum(dim=0, keepdim=True)
-                    / token_length_,
+                    gradcam[1 : token_length_ + 1, :].sum(dim=0, keepdim=True) / token_length_,
                     gradcam[1:, :],
                 )
             )
             gradcam_list.append(gradcam)
-            
+
     return gradcam_list, output

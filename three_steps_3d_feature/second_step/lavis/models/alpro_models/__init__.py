@@ -23,9 +23,7 @@ class AlproBase(BaseModel):
 
     def load_from_pretrained(self, url_or_filename, num_frames, num_patches):
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location="cpu")
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location="cpu")
@@ -48,21 +46,13 @@ class AlproBase(BaseModel):
 
         ## Resizing spatial embeddings in case they don't match
         if num_patches + 1 != state_dict[spatial_embed_key].size(1):
-            state_dict[spatial_embed_key] = resize_spatial_embedding(
-                state_dict, spatial_embed_key, num_patches
-            )
+            state_dict[spatial_embed_key] = resize_spatial_embedding(state_dict, spatial_embed_key, num_patches)
         else:
-            logging.info(
-                "The length of spatial position embedding matches. No need to resize."
-            )
+            logging.info("The length of spatial position embedding matches. No need to resize.")
 
         ## Resizing time embeddings in case they don't match
-        if temporal_embed_key in state_dict and num_frames != state_dict[
-            temporal_embed_key
-        ].size(1):
-            state_dict[temporal_embed_key] = resize_temporal_embedding(
-                state_dict, temporal_embed_key, num_frames
-            )
+        if temporal_embed_key in state_dict and num_frames != state_dict[temporal_embed_key].size(1):
+            state_dict[temporal_embed_key] = resize_temporal_embedding(state_dict, temporal_embed_key, num_frames)
         else:
             logging.info(
                 "No temporal encoding found. Or the length of temporal position embedding matches. No need to resize."
@@ -76,9 +66,7 @@ class AlproBase(BaseModel):
 
 
 def resize_spatial_embedding(state_dict, key, num_patches):
-    logging.info(
-        f"Resizing spatial position embedding from {state_dict[key].size(1)} to {num_patches + 1}"
-    )
+    logging.info(f"Resizing spatial position embedding from {state_dict[key].size(1)} to {num_patches + 1}")
 
     pos_embed = state_dict[key]
 
@@ -93,9 +81,7 @@ def resize_spatial_embedding(state_dict, key, num_patches):
 
 
 def resize_temporal_embedding(state_dict, key, num_frames):
-    logging.info(
-        f"Resizing temporal position embedding from {state_dict[key].size(1)} to {num_frames}"
-    )
+    logging.info(f"Resizing temporal position embedding from {state_dict[key].size(1)} to {num_frames}")
 
     time_embed = state_dict[key].transpose(1, 2)
     new_time_embed = F.interpolate(time_embed, size=(num_frames), mode="nearest")

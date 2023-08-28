@@ -498,7 +498,6 @@ class BertEncoder(nn.Module):
 
             # TODO pay attention to this.
             if self.gradient_checkpointing and self.training:
-
                 if use_cache:
                     logger.warn(
                         "`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`..."
@@ -902,7 +901,6 @@ class BertModel(BertPreTrainedModel):
 
 
 class BertForMaskedLM(BertPreTrainedModel):
-
     _keys_to_ignore_on_load_unexpected = [r"pooler"]
     _keys_to_ignore_on_load_missing = [r"position_ids", r"predictions.decoder.bias"]
 
@@ -1016,7 +1014,6 @@ class BertForMaskedLM(BertPreTrainedModel):
 
 
 class BertLMHeadModel(BertPreTrainedModel):
-
     _keys_to_ignore_on_load_unexpected = [r"pooler"]
     _keys_to_ignore_on_load_missing = [r"position_ids", r"predictions.decoder.bias"]
 
@@ -1181,7 +1178,6 @@ class XBertLMHeadDecoder(BertLMHeadModel):
 
     @classmethod
     def from_config(cls, cfg, from_pretrained=False):
-
         med_config_path = get_abs_path(cfg.get("med_config_path"))
         med_config = BertConfig.from_json_file(med_config_path)
 
@@ -1204,7 +1200,6 @@ class XBertLMHeadDecoder(BertLMHeadModel):
         repetition_penalty=1.0,
         **kwargs
     ):
-
         if not use_nucleus_sampling:
             num_beams = num_beams
             visual_embeds = visual_embeds.repeat_interleave(num_beams, dim=0)
@@ -1249,7 +1244,6 @@ class XBertLMHeadDecoder(BertLMHeadModel):
 class XBertEncoder(BertModel, BaseEncoder):
     @classmethod
     def from_config(cls, cfg, from_pretrained=False):
-
         med_config_path = get_abs_path(cfg.get("med_config_path"))
         med_config = BertConfig.from_json_file(med_config_path)
 

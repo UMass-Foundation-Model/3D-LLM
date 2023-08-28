@@ -120,9 +120,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
         images = torch.cat([image0, image1], dim=0)
 
         image_embeds = self.visual_encoder.forward_features(images)
-        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-            self.device
-        )
+        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.device)
         image0_embeds, image1_embeds = torch.split(image_embeds, targets.size(0))
 
         encoder_output = self.text_encoder(
@@ -144,9 +142,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
                     self._momentum_update()
 
                     image_embeds_m = self.visual_encoder_m(images)
-                    image0_embeds_m, image1_embeds_m = torch.split(
-                        image_embeds_m, targets.size(0)
-                    )
+                    image0_embeds_m, image1_embeds_m = torch.split(image_embeds_m, targets.size(0))
                     encoder_output_m = self.text_encoder(
                         text.input_ids,
                         attention_mask=text.attention_mask,
@@ -158,9 +154,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
                         return_dict=True,
                     )
 
-                    prediction_m = self.cls_head_m(
-                        encoder_output_m.last_hidden_state[:, 0, :]
-                    )
+                    prediction_m = self.cls_head_m(encoder_output_m.last_hidden_state[:, 0, :])
 
                 alpha = self.alpha * self._rampup_factor(
                     epoch=samples["epoch"],
@@ -168,9 +162,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
                     num_iters_per_epoch=samples["num_iters_per_epoch"],
                 )
 
-                loss = (1 - alpha) * F.cross_entropy(
-                    prediction, targets
-                ) - alpha * torch.sum(
+                loss = (1 - alpha) * F.cross_entropy(prediction, targets) - alpha * torch.sum(
                     F.log_softmax(prediction, dim=1) * F.softmax(prediction_m, dim=1),
                     dim=1,
                 ).mean()
@@ -185,9 +177,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
                 loss=loss,
                 intermediate_output=AlbefIntermediateOutput(
                     image_embeds=torch.stack([image0_embeds, image1_embeds], dim=0),
-                    image_embeds_m=torch.stack(
-                        [image0_embeds_m, image1_embeds_m], dim=0
-                    ),
+                    image_embeds_m=torch.stack([image0_embeds_m, image1_embeds_m], dim=0),
                     encoder_output=encoder_output,
                     encoder_output_m=encoder_output_m,
                 ),
@@ -231,9 +221,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
         bert_config = BertConfig.from_json_file(get_abs_path(cfg["med_config_path"]))
         bert_config.num_hidden_layers = 18
 
-        text_encoder = BertModel.from_pretrained(
-            "bert-base-uncased", config=bert_config, add_pooling_layer=False
-        )
+        text_encoder = BertModel.from_pretrained("bert-base-uncased", config=bert_config, add_pooling_layer=False)
 
         alpha = cfg.get("alpha", 0.4)
         momentum = cfg.get("momentum", 0.995)
@@ -241,9 +229,7 @@ class AlbefNLVR(AlbefBase, MomentumDistilationMixin):
         num_classes = cfg.get("num_classes", -1)
         max_txt_len = cfg.get("max_txt_len", 40)
 
-        assert num_classes > 1, "Invalid number of classes provided, found {}".format(
-            num_classes
-        )
+        assert num_classes > 1, "Invalid number of classes provided, found {}".format(num_classes)
 
         model = cls(
             image_encoder=image_encoder,

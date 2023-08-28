@@ -103,9 +103,7 @@ class BlipQuestionProcessor(BaseProcessor):
 
 @registry.register_processor("blip_image_train")
 class BlipImageTrainProcessor(BlipImageBaseProcessor):
-    def __init__(
-        self, image_size=384, mean=None, std=None, min_scale=0.5, max_scale=1.0
-    ):
+    def __init__(self, image_size=384, mean=None, std=None, min_scale=0.5, max_scale=1.0):
         super().__init__(mean=mean, std=std)
 
         self.transform = transforms.Compose(
@@ -170,9 +168,7 @@ class BlipImageEvalProcessor(BlipImageBaseProcessor):
 
         self.transform = transforms.Compose(
             [
-                transforms.Resize(
-                    (image_size, image_size), interpolation=InterpolationMode.BICUBIC
-                ),
+                transforms.Resize((image_size, image_size), interpolation=InterpolationMode.BICUBIC),
                 transforms.ToTensor(),
                 self.normalize,
             ]

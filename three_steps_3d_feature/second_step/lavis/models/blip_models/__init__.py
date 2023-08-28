@@ -11,9 +11,7 @@ from typing import List
 from torch import nn
 
 
-def tie_encoder_decoder_weights(
-    encoder: nn.Module, decoder: nn.Module, base_model_prefix: str, skip_key: str
-):
+def tie_encoder_decoder_weights(encoder: nn.Module, decoder: nn.Module, base_model_prefix: str, skip_key: str):
     uninitialized_encoder_weights: List[str] = []
     if decoder.__class__ != encoder.__class__:
         logging.info(
@@ -47,9 +45,7 @@ def tie_encoder_decoder_weights(
                 len(encoder_modules) > 0
             ), f"Encoder module {encoder_pointer} does not match decoder module {decoder_pointer}"
 
-            all_encoder_weights = set(
-                [module_name + "/" + sub_name for sub_name in encoder_modules.keys()]
-            )
+            all_encoder_weights = set([module_name + "/" + sub_name for sub_name in encoder_modules.keys()])
             encoder_layer_pos = 0
             for name, module in decoder_modules.items():
                 if name.isdigit():
@@ -58,7 +54,9 @@ def tie_encoder_decoder_weights(
                     if not isinstance(
                         decoder_modules[decoder_name],
                         type(encoder_modules[encoder_name]),
-                    ) and len(encoder_modules) != len(decoder_modules):
+                    ) and len(
+                        encoder_modules
+                    ) != len(decoder_modules):
                         # this can happen if the name corresponds to the position in a list module list of layers
                         # in this case the decoder has added a cross-attention that the encoder does not have
                         # thus skip this step and subtract one layer pos from encoder
@@ -85,6 +83,4 @@ def tie_encoder_decoder_weights(
             uninitialized_encoder_weights += list(all_encoder_weights)
 
     # tie weights recursively
-    tie_encoder_to_decoder_recursively(
-        decoder, encoder, base_model_prefix, uninitialized_encoder_weights, skip_key
-    )
+    tie_encoder_to_decoder_recursively(decoder, encoder, base_model_prefix, uninitialized_encoder_weights, skip_key)

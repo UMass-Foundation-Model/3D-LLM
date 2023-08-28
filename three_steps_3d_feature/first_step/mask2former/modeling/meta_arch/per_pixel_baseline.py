@@ -16,7 +16,6 @@ from ..pixel_decoder.fpn import build_pixel_decoder
 
 @SEM_SEG_HEADS_REGISTRY.register()
 class PerPixelBaselineHead(nn.Module):
-
     _version = 2
 
     def _load_from_state_dict(
@@ -74,17 +73,13 @@ class PerPixelBaselineHead(nn.Module):
         self.loss_weight = loss_weight
 
         self.pixel_decoder = pixel_decoder
-        self.predictor = Conv2d(
-            self.pixel_decoder.mask_dim, num_classes, kernel_size=1, stride=1, padding=0
-        )
+        self.predictor = Conv2d(self.pixel_decoder.mask_dim, num_classes, kernel_size=1, stride=1, padding=0)
         weight_init.c2_msra_fill(self.predictor)
 
     @classmethod
     def from_config(cls, cfg, input_shape: Dict[str, ShapeSpec]):
         return {
-            "input_shape": {
-                k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES
-            },
+            "input_shape": {k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES},
             "ignore_value": cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
             "num_classes": cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES,
             "pixel_decoder": build_pixel_decoder(cfg, input_shape),
@@ -101,9 +96,7 @@ class PerPixelBaselineHead(nn.Module):
         if self.training:
             return None, self.losses(x, targets)
         else:
-            x = F.interpolate(
-                x, scale_factor=self.common_stride, mode="bilinear", align_corners=False
-            )
+            x = F.interpolate(x, scale_factor=self.common_stride, mode="bilinear", align_corners=False)
             return x, {}
 
     def layers(self, features):
@@ -113,12 +106,8 @@ class PerPixelBaselineHead(nn.Module):
 
     def losses(self, predictions, targets):
         predictions = predictions.float()  # https://github.com/pytorch/pytorch/issues/48163
-        predictions = F.interpolate(
-            predictions, scale_factor=self.common_stride, mode="bilinear", align_corners=False
-        )
-        loss = F.cross_entropy(
-            predictions, targets, reduction="mean", ignore_index=self.ignore_value
-        )
+        predictions = F.interpolate(predictions, scale_factor=self.common_stride, mode="bilinear", align_corners=False)
+        loss = F.cross_entropy(predictions, targets, reduction="mean", ignore_index=self.ignore_value)
         losses = {"loss_sem_seg": loss * self.loss_weight}
         return losses
 
@@ -199,9 +188,7 @@ class PerPixelBaselinePlusHead(PerPixelBaselineHead):
             in_channels = cfg.MODEL.SEM_SEG_HEAD.CONVS_DIM
         else:
             in_channels = input_shape[ret["transformer_in_feature"]].channels
-        ret["transformer_predictor"] = StandardTransformerDecoder(
-            cfg, in_channels, mask_classification=False
-        )
+        ret["transformer_predictor"] = StandardTransformerDecoder(cfg, in_channels, mask_classification=False)
         ret["deep_supervision"] = cfg.MODEL.MASK_FORMER.DEEP_SUPERVISION
         return ret
 
@@ -216,24 +203,18 @@ class PerPixelBaselinePlusHead(PerPixelBaselineHead):
             if self.deep_supervision:
                 losses = self.losses(x, targets)
                 for i, aux_output in enumerate(aux_outputs):
-                    losses["loss_sem_seg" + f"_{i}"] = self.losses(
-                        aux_output["pred_masks"], targets
-                    )["loss_sem_seg"]
+                    losses["loss_sem_seg" + f"_{i}"] = self.losses(aux_output["pred_masks"], targets)["loss_sem_seg"]
                 return None, losses
             else:
                 return None, self.losses(x, targets)
         else:
-            x = F.interpolate(
-                x, scale_factor=self.common_stride, mode="bilinear", align_corners=False
-            )
+            x = F.interpolate(x, scale_factor=self.common_stride, mode="bilinear", align_corners=False)
             return x, {}
 
     def layers(self, features):
         mask_features, transformer_encoder_features, _ = self.pixel_decoder.forward_features(features)
         if self.transformer_in_feature == "transformer_encoder":
-            assert (
-                transformer_encoder_features is not None
-            ), "Please use the TransformerEncoderPixelDecoder."
+            assert transformer_encoder_features is not None, "Please use the TransformerEncoderPixelDecoder."
             predictions = self.predictor(transformer_encoder_features, mask_features)
         else:
             predictions = self.predictor(features[self.transformer_in_feature], mask_features)

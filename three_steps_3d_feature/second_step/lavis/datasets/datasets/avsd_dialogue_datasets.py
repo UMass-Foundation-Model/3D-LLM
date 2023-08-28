@@ -22,7 +22,6 @@ class AVSDDialDataset(DialogueDataset):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         vname = ann["image_id"]
@@ -43,7 +42,6 @@ class AVSDDialDataset(DialogueDataset):
         }
 
     def collater(self, samples):
-
         input_ids, token_type_ids, labels, video_fts, video_token_type_ids = (
             [],
             [],
@@ -61,9 +59,7 @@ class AVSDDialDataset(DialogueDataset):
 
         input_ids = self.text_processor.padding(input_ids)
 
-        labels = self.text_processor.padding(
-            labels, -1
-        )  # ignore token indice -1 by default
+        labels = self.text_processor.padding(labels, -1)  # ignore token indice -1 by default
         video_fts = self.vis_processor.padding(video_fts)
 
         token_type_ids = self.text_processor.padding(token_type_ids)
@@ -99,7 +95,6 @@ class AVSDDialEvalDataset(DialogueEvalDataset):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         vname = ann["image_id"]
@@ -120,7 +115,6 @@ class AVSDDialEvalDataset(DialogueEvalDataset):
         }
 
     def collater(self, samples):
-
         input_ids, token_type_ids, labels, video_fts, video_token_type_ids = (
             [],
             [],
@@ -138,9 +132,7 @@ class AVSDDialEvalDataset(DialogueEvalDataset):
 
         input_ids = self.text_processor.padding(input_ids)
 
-        labels = self.text_processor.padding(
-            labels, -1
-        )  # ignore token indice -1 by default
+        labels = self.text_processor.padding(labels, -1)  # ignore token indice -1 by default
         video_fts = self.vis_processor.padding(video_fts)
 
         token_type_ids = self.text_processor.padding(token_type_ids)

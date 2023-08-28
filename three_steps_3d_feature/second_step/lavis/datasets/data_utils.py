@@ -134,41 +134,27 @@ def concat_datasets(datasets):
     # concatenate datasets in the same split
     for split_name in datasets:
         if split_name != "train":
-            assert (
-                len(datasets[split_name]) == 1
-            ), "Do not support multiple {} datasets.".format(split_name)
+            assert len(datasets[split_name]) == 1, "Do not support multiple {} datasets.".format(split_name)
             datasets[split_name] = datasets[split_name][0]
         else:
             iterable_datasets, map_datasets = [], []
             for dataset in datasets[split_name]:
                 if isinstance(dataset, wds.DataPipeline):
-                    logging.info(
-                        "Dataset {} is IterableDataset, can't be concatenated.".format(
-                            dataset
-                        )
-                    )
+                    logging.info("Dataset {} is IterableDataset, can't be concatenated.".format(dataset))
                     iterable_datasets.append(dataset)
                 elif isinstance(dataset, IterableDataset):
-                    raise NotImplementedError(
-                        "Do not support concatenation of generic IterableDataset."
-                    )
+                    raise NotImplementedError("Do not support concatenation of generic IterableDataset.")
                 else:
                     map_datasets.append(dataset)
 
             # if len(iterable_datasets) > 0:
             # concatenate map-style datasets and iterable-style datasets separately
-            chained_datasets = (
-                ChainDataset(iterable_datasets) if len(iterable_datasets) > 0 else None
-            )
-            concat_datasets = (
-                ConcatDataset(map_datasets) if len(map_datasets) > 0 else None
-            )
+            chained_datasets = ChainDataset(iterable_datasets) if len(iterable_datasets) > 0 else None
+            concat_datasets = ConcatDataset(map_datasets) if len(map_datasets) > 0 else None
 
             train_datasets = concat_datasets, chained_datasets
             train_datasets = tuple([x for x in train_datasets if x is not None])
-            train_datasets = (
-                train_datasets[0] if len(train_datasets) == 1 else train_datasets
-            )
+            train_datasets = train_datasets[0] if len(train_datasets) == 1 else train_datasets
 
             datasets[split_name] = train_datasets
 
@@ -252,9 +238,7 @@ def extract_archive(from_path, to_path=None, overwrite=False):
         return files
 
     else:
-        raise NotImplementedError(
-            "We currently only support tar.gz, .tgz, .gz and zip achives."
-        )
+        raise NotImplementedError("We currently only support tar.gz, .tgz, .gz and zip achives.")
 
 
 def save_frames_grid(img_array, out_path):
@@ -270,9 +254,7 @@ def save_frames_grid(img_array, out_path):
     elif len(img_array.shape) == 4:
         pass
     else:
-        raise NotImplementedError(
-            "Supports only (b,t,c,h,w)-shaped inputs. First two dimensions can be ignored."
-        )
+        raise NotImplementedError("Supports only (b,t,c,h,w)-shaped inputs. First two dimensions can be ignored.")
 
     assert img_array.shape[1] == 3, "Exepcting input shape of (H, W, 3), i.e. RGB-only."
 

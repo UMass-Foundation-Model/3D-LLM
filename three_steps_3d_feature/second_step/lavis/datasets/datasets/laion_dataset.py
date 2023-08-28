@@ -36,9 +36,7 @@ if __name__ == "__main__":
     def to_image_text_pair(sample):
         return sample[0], sample[1]["caption"]
 
-    normalize = transforms.Normalize(
-        (0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)
-    )
+    normalize = transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
 
     transform_train = transforms.Compose(
         [

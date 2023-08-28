@@ -125,9 +125,7 @@ class MaskFormerInstanceDatasetMapper:
                 # COCO RLE
                 masks.append(mask_util.decode(segm))
             elif isinstance(segm, np.ndarray):
-                assert segm.ndim == 2, "Expect segmentation of 2 dimensions, got {}.".format(
-                    segm.ndim
-                )
+                assert segm.ndim == 2, "Expect segmentation of 2 dimensions, got {}.".format(segm.ndim)
                 # mask array
                 masks.append(segm)
             else:

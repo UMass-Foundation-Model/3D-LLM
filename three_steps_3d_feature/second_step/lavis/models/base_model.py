@@ -34,9 +34,7 @@ class BaseModel(nn.Module):
         """
 
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location="cpu")
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location="cpu")
@@ -73,9 +71,7 @@ class BaseModel(nn.Module):
 
     @classmethod
     def default_config_path(cls, model_type):
-        assert (
-            model_type in cls.PRETRAINED_MODEL_CONFIG_DICT
-        ), "Unknown model type {}".format(model_type)
+        assert model_type in cls.PRETRAINED_MODEL_CONFIG_DICT, "Unknown model type {}".format(model_type)
         return get_abs_path(cls.PRETRAINED_MODEL_CONFIG_DICT[model_type])
 
     def load_checkpoint_from_config(self, cfg, **kwargs):
@@ -89,9 +85,7 @@ class BaseModel(nn.Module):
         load_finetuned = cfg.get("load_finetuned", True)
         if load_finetuned:
             finetune_path = cfg.get("finetuned", None)
-            assert (
-                finetune_path is not None
-            ), "Found load_finetuned is True, but finetune_path is None."
+            assert finetune_path is not None, "Found load_finetuned is True, but finetune_path is None."
             self.load_checkpoint(url_or_filename=finetune_path)
         else:
             # load pre-trained weights
@@ -162,21 +156,15 @@ class MomentumDistilationMixin:
     @torch.no_grad()
     def copy_params(self):
         for model_pair in self.model_pairs:
-            for param, param_m in zip(
-                model_pair[0].parameters(), model_pair[1].parameters()
-            ):
+            for param, param_m in zip(model_pair[0].parameters(), model_pair[1].parameters()):
                 param_m.data.copy_(param.data)  # initialize
                 param_m.requires_grad = False  # not update by gradient
 
     @torch.no_grad()
     def _momentum_update(self):
         for model_pair in self.model_pairs:
-            for param, param_m in zip(
-                model_pair[0].parameters(), model_pair[1].parameters()
-            ):
-                param_m.data = param_m.data * self.momentum + param.data * (
-                    1.0 - self.momentum
-                )
+            for param, param_m in zip(model_pair[0].parameters(), model_pair[1].parameters()):
+                param_m.data = param_m.data * self.momentum + param.data * (1.0 - self.momentum)
 
 
 class GatherLayer(torch.autograd.Function):
@@ -187,9 +175,7 @@ class GatherLayer(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx, x):
-        output = [
-            torch.zeros_like(x) for _ in range(torch.distributed.get_world_size())
-        ]
+        output = [torch.zeros_like(x) for _ in range(torch.distributed.get_world_size())]
         torch.distributed.all_gather(output, x)
         return tuple(output)
 
@@ -227,9 +213,7 @@ def concat_all_gather(tensor):
     if not is_dist_avail_and_initialized():
         return tensor
 
-    tensors_gather = [
-        torch.ones_like(tensor) for _ in range(torch.distributed.get_world_size())
-    ]
+    tensors_gather = [torch.ones_like(tensor) for _ in range(torch.distributed.get_world_size())]
     torch.distributed.all_gather(tensors_gather, tensor, async_op=False)
 
     output = torch.cat(tensors_gather, dim=0)
@@ -241,7 +225,5 @@ def tile(x, dim, n_tile):
     repeat_idx = [1] * x.dim()
     repeat_idx[dim] = n_tile
     x = x.repeat(*(repeat_idx))
-    order_index = torch.LongTensor(
-        np.concatenate([init_dim * np.arange(n_tile) + i for i in range(init_dim)])
-    )
+    order_index = torch.LongTensor(np.concatenate([init_dim * np.arange(n_tile) + i for i in range(init_dim)]))
     return torch.index_select(x, dim, order_index.to(x.device))

@@ -71,9 +71,7 @@ class CaptionTask(BaseTask):
         )
 
         if self.report_metric:
-            metrics = self._report_metrics(
-                eval_result_file=eval_result_file, split_name=split_name
-            )
+            metrics = self._report_metrics(eval_result_file=eval_result_file, split_name=split_name)
         else:
             metrics = {"agg_metrics": 0.0}
 
@@ -81,7 +79,6 @@ class CaptionTask(BaseTask):
 
     @main_process
     def _report_metrics(self, eval_result_file, split_name):
-
         # TODO better way to define this
         coco_gt_root = os.path.join(registry.get_path("cache_root"), "coco_gt")
         coco_val = coco_caption_eval(coco_gt_root, eval_result_file, split_name)
@@ -89,9 +86,7 @@ class CaptionTask(BaseTask):
         agg_metrics = coco_val.eval["CIDEr"] + coco_val.eval["Bleu_4"]
         log_stats = {split_name: {k: v for k, v in coco_val.eval.items()}}
 
-        with open(
-            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-        ) as f:
+        with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
             f.write(json.dumps(log_stats) + "\n")
 
         coco_res = {k: v for k, v in coco_val.eval.items()}

@@ -69,7 +69,6 @@ class DialogueDataset(BaseDataset, __DisplMixin):
                 n += 1
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         image_path = os.path.join(self.vis_root, ann["image"])
@@ -126,7 +125,6 @@ class DialogueEvalDataset(BaseDataset, __DisplMixin):
                 n += 1
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         image_path = os.path.join(self.vis_root, ann["image"])

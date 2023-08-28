@@ -115,7 +115,6 @@ def download_google_drive_url(url: str, output_path: str, output_file_name: str)
     import requests
 
     with requests.Session() as session:
-
         # First get the confirmation token and append it to the URL
         with session.get(url, stream=True, allow_redirects=True) as response:
             for k, v in response.cookies.items():
@@ -411,5 +410,5 @@ def get_file_size(filename):
     """
     Given a file, get the size of file in MB
     """
-    size_in_mb = os.path.getsize(filename) / float(1024 ** 2)
+    size_in_mb = os.path.getsize(filename) / float(1024**2)
     return size_in_mb

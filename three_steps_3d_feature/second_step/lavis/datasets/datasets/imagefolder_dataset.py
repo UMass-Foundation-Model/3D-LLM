@@ -20,8 +20,7 @@ class ImageFolderDataset(BaseDataset):
         self.inner_dataset = datasets.ImageFolder(vis_root)
 
         self.annotation = [
-            {"image": elem[0], "label": elem[1], "image_id": elem[0]}
-            for elem in self.inner_dataset.imgs
+            {"image": elem[0], "label": elem[1], "image_id": elem[0]} for elem in self.inner_dataset.imgs
         ]
 
         self.classnames = classnames

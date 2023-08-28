@@ -126,9 +126,7 @@ class BlipFeatureExtractor(BlipBase):
         image_features, text_features = None, None
 
         if mode == "image":
-            assert (
-                image is not None
-            ), "Image is not provided for mode 'image' or 'multimodal'"
+            assert image is not None, "Image is not provided for mode 'image' or 'multimodal'"
             # return image features
             image_embeds = self.visual_encoder.forward_features(image)
 
@@ -136,13 +134,9 @@ class BlipFeatureExtractor(BlipBase):
             image_features = F.normalize(image_features, dim=-1)
 
         elif mode == "text":
-            assert (
-                caption is not None
-            ), "text input is None for mode 'text' or 'multimodal'"
+            assert caption is not None, "text input is None for mode 'text' or 'multimodal'"
 
-            text = self.tokenizer(caption, return_tensors="pt", padding=True).to(
-                self.device
-            )
+            text = self.tokenizer(caption, return_tensors="pt", padding=True).to(self.device)
 
             # return text features
             text_output = self.text_encoder(
@@ -159,13 +153,9 @@ class BlipFeatureExtractor(BlipBase):
         elif mode == "multimodal":
             # return multimodel features
             image_embeds = self.visual_encoder.forward_features(image)
-            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-                self.device
-            )
+            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.device)
 
-            text = self.tokenizer(caption, return_tensors="pt", padding=True).to(
-                self.device
-            )
+            text = self.tokenizer(caption, return_tensors="pt", padding=True).to(self.device)
             text.input_ids[:, 0] = self.tokenizer.enc_token_id
 
             output = self.text_encoder(

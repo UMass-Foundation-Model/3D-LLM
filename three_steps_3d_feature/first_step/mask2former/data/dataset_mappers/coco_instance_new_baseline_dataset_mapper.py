@@ -56,12 +56,12 @@ def build_transform_gen(cfg, is_train):
             )
         )
 
-    augmentation.extend([
-        T.ResizeScale(
-            min_scale=min_scale, max_scale=max_scale, target_height=image_size, target_width=image_size
-        ),
-        T.FixedSizeCrop(crop_size=(image_size, image_size)),
-    ])
+    augmentation.extend(
+        [
+            T.ResizeScale(min_scale=min_scale, max_scale=max_scale, target_height=image_size, target_width=image_size),
+            T.FixedSizeCrop(crop_size=(image_size, image_size)),
+        ]
+    )
 
     return augmentation
 
@@ -105,7 +105,7 @@ class COCOInstanceNewBaselineDatasetMapper:
 
         self.img_format = image_format
         self.is_train = is_train
-    
+
     @classmethod
     def from_config(cls, cfg, is_train=True):
         # Build augmentation
@@ -137,7 +137,7 @@ class COCOInstanceNewBaselineDatasetMapper:
         image, transforms = T.apply_transform_gens(self.tfm_gens, image)
         # the crop transformation has default padding value 0 for segmentation
         padding_mask = transforms.apply_segmentation(padding_mask)
-        padding_mask = ~ padding_mask.astype(bool)
+        padding_mask = ~padding_mask.astype(bool)
 
         image_shape = image.shape[:2]  # h, w
 
@@ -180,7 +180,7 @@ class COCOInstanceNewBaselineDatasetMapper:
             # Generate masks from polygon
             h, w = instances.image_size
             # image_size_xyxy = torch.as_tensor([w, h, w, h], dtype=torch.float)
-            if hasattr(instances, 'gt_masks'):
+            if hasattr(instances, "gt_masks"):
                 gt_masks = instances.gt_masks
                 gt_masks = convert_coco_poly_to_mask(gt_masks.polygons, h, w)
                 instances.gt_masks = gt_masks

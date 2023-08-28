@@ -16,11 +16,9 @@ from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 
 @registry.register_model("gpt_dialogue")
 class GPTDialogue(BaseModel, GPT2LMHeadModel):
-
     PRETRAINED_MODEL_CONFIG_DICT = {"base": "configs/models/gpt_dialogue_base.yaml"}
 
     def __init__(self, config, len_video_ft=4224):
-
         super().__init__(config)
 
         self.video_ff = nn.Linear(len_video_ft, config.n_embd)
@@ -46,7 +44,6 @@ class GPTDialogue(BaseModel, GPT2LMHeadModel):
         output_hidden_states=None,
         return_dict=None,
     ):
-
         input_embs = self.transformer.wte(samples["input_ids"])
         video_embs = self.video_ff(samples["video_fts"])
         input_embs = torch.cat([video_embs, input_embs], dim=1)
@@ -75,9 +72,7 @@ class GPTDialogue(BaseModel, GPT2LMHeadModel):
             shift_labels = samples["labels"][..., 1:].contiguous()
             # Flatten the tokens
             loss_fct = CrossEntropyLoss(ignore_index=-1)
-            loss = loss_fct(
-                shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1)
-            )
+            loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
 
         if samples["video_fts"] is not None:
             len_video_fts = samples["video_fts"].shape[1]

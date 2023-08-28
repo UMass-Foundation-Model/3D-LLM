@@ -21,9 +21,7 @@ class __DisplMixin:
         vname = ann["video"]
         vpath = os.path.join(self.vis_root, vname)
 
-        return OrderedDict(
-            {"file": vpath, "question": ann["question"], "answer": ann["answer"]}
-        )
+        return OrderedDict({"file": vpath, "question": ann["question"], "answer": ann["answer"]})
 
 
 class VideoQADataset(MultimodalClassificationDataset, __DisplMixin):
@@ -42,9 +40,7 @@ class VideoQADataset(MultimodalClassificationDataset, __DisplMixin):
             return len(self.class_labels)
 
     def __getitem__(self, index):
-        assert (
-            self.class_labels
-        ), f"class_labels of {__class__.__name__} is not built yet."
+        assert self.class_labels, f"class_labels of {__class__.__name__} is not built yet."
 
         ann = self.annotation[index]
 

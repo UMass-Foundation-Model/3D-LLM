@@ -155,7 +155,7 @@ After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``
 TODO
 
 #### Neural Field
-Please refer to (3D-CLR)[https://github.com/evelinehong/3D-CLR-Official] repository.
+Please refer to [3D-CLR](https://github.com/evelinehong/3D-CLR-Official) repository.
 
 ## 3D-LLM_BLIP2-based
 ### Installation

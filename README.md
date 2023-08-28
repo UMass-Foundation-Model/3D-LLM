@@ -151,8 +151,11 @@ After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``
 ``pcd_pos.pt`` contains the point positions of the 3D point cloud (shape: ``N * 3``). ``pcd_feat.pt`` contains the point features of the 3D point cloud (shape: ``N * n_dim``).
 ``N`` is the number of sampled points in the point cloud (default: 300000) and ``n_dim`` is the feature dimension (1024 for CLIP feature, 1408 for BLIP feature).
 
-#### GradSLAM
+#### GradSLAM (Feature Fusion)
 TODO
+
+#### Neural Field
+Please refer to (3D-CLR)[https://github.com/evelinehong/3D-CLR-Official] repository.
 
 ## 3D-LLM_BLIP2-based
 ### Installation

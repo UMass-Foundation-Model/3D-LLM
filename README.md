@@ -38,7 +38,7 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
 #### Scene Data
  &emsp; [Language data released here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing)
  
- &emsp; 3D features and point clouds (~250G) is released [here](https://drive.google.com/file/d/118JSjS1nl-1v87wC2oTxEmQzSSyCIBXM/view?usp=sharing). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction)
+ &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/file/d/118JSjS1nl-1v87wC2oTxEmQzSSyCIBXM/view?usp=sharing). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction)
 
 ### Finetuning Data
 TODO.

@@ -34,7 +34,7 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
   
   &emsp;To get 3D features and point clouds of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
 
-  &emsp;We will also release a small set of Objaverse 3D features
+  &emsp;TODO: We will also release a small set (or probably the whole set) of Objaverse 3D features 
 #### Scene Data
  &emsp; [Language data released here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing)
  

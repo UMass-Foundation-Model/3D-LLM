@@ -117,6 +117,8 @@ After the first step, we are expected to obtain a directory of masks (specified 
 multi-view images of the scenes.
 
 ### Second step
+Note: BLIP features are for LAVIS(BLIP2), CLIP features are for open-flamingo.
+
 Installation: The same as the following ``3D-LLM_BLIP2-based`` section to install [salesforce-lavis](https://github.com/salesforce/LAVIS).
 
 There are four options: (1) Extract CLIP feature with Mask2Former masks; (2) Extract CLIP feature with SAM masks;

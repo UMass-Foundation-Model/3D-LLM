@@ -45,7 +45,7 @@ TODO.
 
 ## 3DLanguage Data Generation
 
-### ChatCaptioner based 
+### ChatCaptioner based / Three-step 3D Feature Extraction (Objaverse)
 #### Step1: render images from different views of a scene
 Follow the instruction in ``3DLanguage_data/ChatCaptioner_based/objaverse_render/README.md`` for installation. 
 
@@ -87,7 +87,7 @@ TODO
 ### Revision based
 TODO
 
-## Three-step 3D Feature Extraction
+## Three-step 3D Feature Extraction (Scene)
 This section is for constructing 3D features for scene data. If you already downloaded our released scene data, please skip this section.
 ### First step
 Installation: 

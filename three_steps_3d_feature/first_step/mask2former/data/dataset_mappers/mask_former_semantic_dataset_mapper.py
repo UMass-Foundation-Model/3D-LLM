@@ -174,9 +174,7 @@ class MaskFormerSemanticDatasetMapper:
                 # Some image does not have annotation (all ignored)
                 instances.gt_masks = torch.zeros((0, sem_seg_gt.shape[-2], sem_seg_gt.shape[-1]))
             else:
-                masks = BitMasks(
-                    torch.stack([torch.from_numpy(np.ascontiguousarray(x.copy())) for x in masks])
-                )
+                masks = BitMasks(torch.stack([torch.from_numpy(np.ascontiguousarray(x.copy())) for x in masks]))
                 instances.gt_masks = masks.tensor
 
             dataset_dict["instances"] = instances

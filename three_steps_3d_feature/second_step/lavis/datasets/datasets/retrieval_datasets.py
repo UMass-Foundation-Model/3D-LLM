@@ -43,7 +43,6 @@ class RetrievalDataset(BaseDataset, __DisplMixin):
                 n += 1
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         image_path = os.path.join(self.vis_root, ann["image"])
@@ -86,7 +85,6 @@ class RetrievalEvalDataset(BaseDataset, __DisplMixin):
                 txt_id += 1
 
     def __getitem__(self, index):
-
         image_path = os.path.join(self.vis_root, self.annotation[index]["image"])
         image = Image.open(image_path).convert("RGB")
 
@@ -112,7 +110,6 @@ class VideoRetrievalDataset(BaseDataset, __DisplMixin):
                 n += 1
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         vpath = os.path.join(self.vis_root, ann["video"])

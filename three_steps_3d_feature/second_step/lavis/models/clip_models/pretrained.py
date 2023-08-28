@@ -93,11 +93,7 @@ def list_pretrained(as_str: bool = False):
     """returns list of pretrained models
     Returns a tuple (model_name, pretrain_tag) by default or 'name:tag' if as_str == True
     """
-    return [
-        ":".join([k, t]) if as_str else (k, t)
-        for k in _PRETRAINED.keys()
-        for t in _PRETRAINED[k].keys()
-    ]
+    return [":".join([k, t]) if as_str else (k, t) for k in _PRETRAINED.keys() for t in _PRETRAINED[k].keys()]
 
 
 def list_pretrained_tag_models(tag: str):
@@ -143,10 +139,7 @@ def download_pretrained(url: str, root: str = os.path.expanduser("~/.cache/clip"
 
     if os.path.isfile(download_target):
         if expected_sha256:
-            if (
-                hashlib.sha256(open(download_target, "rb").read()).hexdigest()
-                == expected_sha256
-            ):
+            if hashlib.sha256(open(download_target, "rb").read()).hexdigest() == expected_sha256:
                 return download_target
             else:
                 warnings.warn(
@@ -170,13 +163,7 @@ def download_pretrained(url: str, root: str = os.path.expanduser("~/.cache/clip"
                 output.write(buffer)
                 loop.update(len(buffer))
 
-    if (
-        expected_sha256
-        and hashlib.sha256(open(download_target, "rb").read()).hexdigest()
-        != expected_sha256
-    ):
-        raise RuntimeError(
-            f"Model has been downloaded but the SHA256 checksum does not not match"
-        )
+    if expected_sha256 and hashlib.sha256(open(download_target, "rb").read()).hexdigest() != expected_sha256:
+        raise RuntimeError(f"Model has been downloaded but the SHA256 checksum does not not match")
 
     return download_target

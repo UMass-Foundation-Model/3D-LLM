@@ -107,13 +107,9 @@ class Bottleneck(nn.Module):
 
 
 class AttentionPool2d(nn.Module):
-    def __init__(
-        self, spacial_dim: int, embed_dim: int, num_heads: int, output_dim: int = None
-    ):
+    def __init__(self, spacial_dim: int, embed_dim: int, num_heads: int, output_dim: int = None):
         super().__init__()
-        self.positional_embedding = nn.Parameter(
-            torch.randn(spacial_dim**2 + 1, embed_dim) / embed_dim**0.5
-        )
+        self.positional_embedding = nn.Parameter(torch.randn(spacial_dim**2 + 1, embed_dim) / embed_dim**0.5)
         self.k_proj = nn.Linear(embed_dim, embed_dim)
         self.q_proj = nn.Linear(embed_dim, embed_dim)
         self.v_proj = nn.Linear(embed_dim, embed_dim)
@@ -121,9 +117,7 @@ class AttentionPool2d(nn.Module):
         self.num_heads = num_heads
 
     def forward(self, x):
-        x = x.reshape(x.shape[0], x.shape[1], x.shape[2] * x.shape[3]).permute(
-            2, 0, 1
-        )  # NCHW -> (HW)NC
+        x = x.reshape(x.shape[0], x.shape[1], x.shape[2] * x.shape[3]).permute(2, 0, 1)  # NCHW -> (HW)NC
         x = torch.cat([x.mean(dim=0, keepdim=True), x], dim=0)  # (HW+1)NC
         x = x + self.positional_embedding[:, None, :].to(x.dtype)  # (HW+1)NC
         x, _ = F.multi_head_attention_forward(
@@ -136,9 +130,7 @@ class AttentionPool2d(nn.Module):
             k_proj_weight=self.k_proj.weight,
             v_proj_weight=self.v_proj.weight,
             in_proj_weight=None,
-            in_proj_bias=torch.cat(
-                [self.q_proj.bias, self.k_proj.bias, self.v_proj.bias]
-            ),
+            in_proj_bias=torch.cat([self.q_proj.bias, self.k_proj.bias, self.v_proj.bias]),
             bias_k=None,
             bias_v=None,
             add_zero_attn=False,
@@ -167,13 +159,9 @@ class ModifiedResNet(nn.Module):
         self.image_size = image_size
 
         # the 3-layer stem
-        self.conv1 = nn.Conv2d(
-            3, width // 2, kernel_size=3, stride=2, padding=1, bias=False
-        )
+        self.conv1 = nn.Conv2d(3, width // 2, kernel_size=3, stride=2, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(width // 2)
-        self.conv2 = nn.Conv2d(
-            width // 2, width // 2, kernel_size=3, padding=1, bias=False
-        )
+        self.conv2 = nn.Conv2d(width // 2, width // 2, kernel_size=3, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(width // 2)
         self.conv3 = nn.Conv2d(width // 2, width, kernel_size=3, padding=1, bias=False)
         self.bn3 = nn.BatchNorm2d(width)
@@ -215,9 +203,7 @@ class ModifiedResNet(nn.Module):
                     nn.init.zeros_(param)
 
     def lock(self, unlocked_groups=0, freeze_bn_stats=False):
-        assert (
-            unlocked_groups == 0
-        ), "partial locking not currently supported for this model"
+        assert unlocked_groups == 0, "partial locking not currently supported for this model"
         for param in self.parameters():
             param.requires_grad = False
         if freeze_bn_stats:
@@ -286,17 +272,12 @@ class ResidualAttentionBlock(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(
-        self, width: int, layers: int, heads: int, act_layer: Callable = nn.GELU
-    ):
+    def __init__(self, width: int, layers: int, heads: int, act_layer: Callable = nn.GELU):
         super().__init__()
         self.width = width
         self.layers = layers
         self.resblocks = nn.ModuleList(
-            [
-                ResidualAttentionBlock(width, heads, act_layer=act_layer)
-                for _ in range(layers)
-            ]
+            [ResidualAttentionBlock(width, heads, act_layer=act_layer) for _ in range(layers)]
         )
 
     def forward(self, x: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
@@ -329,9 +310,7 @@ class VisualTransformer(nn.Module):
 
         scale = width**-0.5
         self.class_embedding = nn.Parameter(scale * torch.randn(width))
-        self.positional_embedding = nn.Parameter(
-            scale * torch.randn((image_size // patch_size) ** 2 + 1, width)
-        )
+        self.positional_embedding = nn.Parameter(scale * torch.randn((image_size // patch_size) ** 2 + 1, width))
         self.ln_pre = LayerNorm(width)
 
         self.transformer = Transformer(width, layers, heads, act_layer=act_layer)
@@ -340,9 +319,7 @@ class VisualTransformer(nn.Module):
         self.proj = nn.Parameter(scale * torch.randn(width, output_dim))
 
     def lock(self, unlocked_groups=0, freeze_bn_stats=False):
-        assert (
-            unlocked_groups == 0
-        ), "partial locking not currently supported for this model"
+        assert unlocked_groups == 0, "partial locking not currently supported for this model"
         for param in self.parameters():
             param.requires_grad = False
 
@@ -353,9 +330,7 @@ class VisualTransformer(nn.Module):
         x = torch.cat(
             [
                 self.class_embedding.to(x.dtype)
-                + torch.zeros(
-                    x.shape[0], 1, x.shape[-1], dtype=x.dtype, device=x.device
-                ),
+                + torch.zeros(x.shape[0], 1, x.shape[-1], dtype=x.dtype, device=x.device),
                 x,
             ],
             dim=1,
@@ -381,18 +356,10 @@ class CLIPVisionCfg:
     width: int = 768
     patch_size: int = 16
     image_size: Union[Tuple[int, int], int] = 224
-    timm_model_name: str = (
-        None  # a valid model name overrides layers, width, patch_size
-    )
-    timm_model_pretrained: bool = (
-        False  # use (imagenet) pretrained weights for named model
-    )
-    timm_pool: str = (
-        "avg"  # feature pooling for timm model ('abs_attn', 'rot_attn', 'avg', '')
-    )
-    timm_proj: str = (
-        "linear"  # linear projection for timm model output ('linear', 'mlp', '')
-    )
+    timm_model_name: str = None  # a valid model name overrides layers, width, patch_size
+    timm_model_pretrained: bool = False  # use (imagenet) pretrained weights for named model
+    timm_pool: str = "avg"  # feature pooling for timm model ('abs_attn', 'rot_attn', 'avg', '')
+    timm_proj: str = "linear"  # linear projection for timm model output ('linear', 'mlp', '')
 
 
 @dataclass
@@ -450,9 +417,7 @@ class CLIP(BaseModel):
                 embed_dim=embed_dim,
                 image_size=vision_cfg.image_size,
             )
-            act_layer = (
-                nn.GELU
-            )  # so that text transformer doesn't use QuickGELU w/ timm models
+            act_layer = nn.GELU  # so that text transformer doesn't use QuickGELU w/ timm models
         elif isinstance(vision_cfg.layers, (tuple, list)):
             vision_heads = vision_cfg.width * 32 // 64
             self.visual = ModifiedResNet(
@@ -483,9 +448,7 @@ class CLIP(BaseModel):
 
         self.vocab_size = text_cfg.vocab_size
         self.token_embedding = nn.Embedding(text_cfg.vocab_size, text_cfg.width)
-        self.positional_embedding = nn.Parameter(
-            torch.empty(self.context_length, text_cfg.width)
-        )
+        self.positional_embedding = nn.Parameter(torch.empty(self.context_length, text_cfg.width))
         self.ln_final = LayerNorm(text_cfg.width)
 
         self.text_projection = nn.Parameter(torch.empty(text_cfg.width, embed_dim))
@@ -521,9 +484,7 @@ class CLIP(BaseModel):
         if hasattr(self.visual, "init_parameters"):
             self.visual.init_parameters()
 
-        proj_std = (self.transformer.width**-0.5) * (
-            (2 * self.transformer.layers) ** -0.5
-        )
+        proj_std = (self.transformer.width**-0.5) * ((2 * self.transformer.layers) ** -0.5)
         attn_std = self.transformer.width**-0.5
         fc_std = (2 * self.transformer.width) ** -0.5
         for block in self.transformer.resblocks:
@@ -545,9 +506,7 @@ class CLIP(BaseModel):
 
     def lock_image_tower(self, unlocked_groups=0, freeze_bn_stats=False):
         # lock image tower as per LiT - https://arxiv.org/abs/2111.07991
-        self.visual.lock(
-            unlocked_groups=unlocked_groups, freeze_bn_stats=freeze_bn_stats
-        )
+        self.visual.lock(unlocked_groups=unlocked_groups, freeze_bn_stats=freeze_bn_stats)
 
     def encode_image(self, image):
         return self.visual(image)
@@ -659,9 +618,7 @@ class CLIP(BaseModel):
         with torch.no_grad():
             zeroshot_weights = []
             for classname in classnames:
-                texts = [
-                    template(classname) for template in templates
-                ]  # format with class
+                texts = [template(classname) for template in templates]  # format with class
                 texts = self.tokenizer(texts).to(self.device)  # tokenize
 
                 class_embeddings = self.encode_text(texts)
@@ -675,9 +632,7 @@ class CLIP(BaseModel):
     def default_config_path(cls, model_type="base"):
         model_type = "ViT-B-32" if model_type == "base" else model_type
 
-        assert (
-            model_type in cls.PRETRAINED_MODEL_CONFIG_DICT
-        ), "Unknown model type {}. \n Available types: {}".format(
+        assert model_type in cls.PRETRAINED_MODEL_CONFIG_DICT, "Unknown model type {}. \n Available types: {}".format(
             model_type, cls.PRETRAINED_MODEL_CONFIG_DICT.keys()
         )
         return get_abs_path(cls.PRETRAINED_MODEL_CONFIG_DICT[model_type])
@@ -689,14 +644,10 @@ class CLIP(BaseModel):
 
         precision = cfg.get("precision", "fp32")
 
-        return create_model(
-            model_name=model_name, pretrained=pretrained, precision=precision
-        )
+        return create_model(model_name=model_name, pretrained=pretrained, precision=precision)
 
     def zero_shot_predict(self, image_path, categories):
-        assert isinstance(
-            categories, list
-        ), f"categories must be a list, got {type(categories)}."
+        assert isinstance(categories, list), f"categories must be a list, got {type(categories)}."
         assert os.path.exists(image_path), f"File {image_path} does not exist."
 
         from lavis.processors.clip_processors import ClipImageEvalProcessor
@@ -727,7 +678,6 @@ class CLIP(BaseModel):
         text_features = []
 
         for i in range(0, num_text, text_bs):
-
             text = texts[i : min(num_text, i + text_bs)]
             text_input = self.tokenizer(text).to(self.device)
 
@@ -795,38 +745,20 @@ def build_model_from_openai_state_dict(state_dict: dict):
     if vit:
         vision_width = state_dict["visual.conv1.weight"].shape[0]
         vision_layers = len(
-            [
-                k
-                for k in state_dict.keys()
-                if k.startswith("visual.") and k.endswith(".attn.in_proj_weight")
-            ]
+            [k for k in state_dict.keys() if k.startswith("visual.") and k.endswith(".attn.in_proj_weight")]
         )
         vision_patch_size = state_dict["visual.conv1.weight"].shape[-1]
-        grid_size = round(
-            (state_dict["visual.positional_embedding"].shape[0] - 1) ** 0.5
-        )
+        grid_size = round((state_dict["visual.positional_embedding"].shape[0] - 1) ** 0.5)
         image_size = vision_patch_size * grid_size
     else:
         counts: list = [
-            len(
-                set(
-                    k.split(".")[2]
-                    for k in state_dict
-                    if k.startswith(f"visual.layer{b}")
-                )
-            )
-            for b in [1, 2, 3, 4]
+            len(set(k.split(".")[2] for k in state_dict if k.startswith(f"visual.layer{b}"))) for b in [1, 2, 3, 4]
         ]
         vision_layers = tuple(counts)
         vision_width = state_dict["visual.layer1.0.conv1.weight"].shape[0]
-        output_width = round(
-            (state_dict["visual.attnpool.positional_embedding"].shape[0] - 1) ** 0.5
-        )
+        output_width = round((state_dict["visual.attnpool.positional_embedding"].shape[0] - 1) ** 0.5)
         vision_patch_size = None
-        assert (
-            output_width**2 + 1
-            == state_dict["visual.attnpool.positional_embedding"].shape[0]
-        )
+        assert output_width**2 + 1 == state_dict["visual.attnpool.positional_embedding"].shape[0]
         image_size = output_width * 32
 
     embed_dim = state_dict["text_projection"].shape[1]
@@ -834,13 +766,7 @@ def build_model_from_openai_state_dict(state_dict: dict):
     vocab_size = state_dict["token_embedding.weight"].shape[0]
     transformer_width = state_dict["ln_final.weight"].shape[0]
     transformer_heads = transformer_width // 64
-    transformer_layers = len(
-        set(
-            k.split(".")[2]
-            for k in state_dict
-            if k.startswith(f"transformer.resblocks")
-        )
-    )
+    transformer_layers = len(set(k.split(".")[2] for k in state_dict if k.startswith(f"transformer.resblocks")))
 
     vision_cfg = CLIPVisionCfg(
         layers=vision_layers,
@@ -874,9 +800,7 @@ def trace_model(model, batch_size=256, device=torch.device("cpu")):
     model.eval()
     image_size = model.visual.image_size
     example_images = torch.ones((batch_size, 3, image_size, image_size), device=device)
-    example_text = torch.zeros(
-        (batch_size, model.context_length), dtype=torch.int, device=device
-    )
+    example_text = torch.zeros((batch_size, model.context_length), dtype=torch.int, device=device)
     model = torch.jit.trace_module(
         model,
         inputs=dict(
@@ -911,10 +835,7 @@ def _rescan_model_configs():
             if all(a in model_cfg for a in ("embed_dim", "vision_cfg", "text_cfg")):
                 _MODEL_CONFIGS[cf.stem] = model_cfg
 
-    _MODEL_CONFIGS = {
-        k: v
-        for k, v in sorted(_MODEL_CONFIGS.items(), key=lambda x: _natural_key(x[0]))
-    }
+    _MODEL_CONFIGS = {k: v for k, v in sorted(_MODEL_CONFIGS.items(), key=lambda x: _natural_key(x[0]))}
 
 
 _rescan_model_configs()  # initial populate of model config registry
@@ -940,9 +861,7 @@ def create_model(
     force_quick_gelu: bool = False,
     pretrained_image: bool = False,
 ):
-    model_name = model_name.replace(
-        "/", "-"
-    )  # for callers using old naming with / in ViT names
+    model_name = model_name.replace("/", "-")  # for callers using old naming with / in ViT names
 
     if pretrained.lower() == "openai":
         logging.info(f"Loading pretrained {model_name} from OpenAI.")
@@ -956,9 +875,7 @@ def create_model(
             logging.info(f"Loading {model_name} model config.")
             model_cfg = deepcopy(_MODEL_CONFIGS[model_name])
         else:
-            logging.error(
-                f"Model config for {model_name} not found; available models {list_models()}."
-            )
+            logging.error(f"Model config for {model_name} not found; available models {list_models()}.")
             raise RuntimeError(f"Model config for {model_name} not found.")
 
         if force_quick_gelu:
@@ -970,9 +887,7 @@ def create_model(
                 # pretrained weight loading for timm models set via vision_cfg
                 model_cfg["vision_cfg"]["timm_model_pretrained"] = True
             else:
-                assert (
-                    False
-                ), "pretrained image towers currently only supported for timm models"
+                assert False, "pretrained image towers currently only supported for timm models"
 
         model = CLIP(**model_cfg)
 
@@ -988,12 +903,8 @@ def create_model(
                 logging.info(f"Loading pretrained {model_name} weights ({pretrained}).")
                 model.load_state_dict(load_state_dict(checkpoint_path))
             else:
-                logging.warning(
-                    f"Pretrained weights ({pretrained}) not found for model {model_name}."
-                )
-                raise RuntimeError(
-                    f"Pretrained weights ({pretrained}) not found for model {model_name}."
-                )
+                logging.warning(f"Pretrained weights ({pretrained}) not found for model {model_name}.")
+                raise RuntimeError(f"Pretrained weights ({pretrained}) not found for model {model_name}.")
 
         model.to(device=device)
         if precision == "fp16":
@@ -1073,9 +984,7 @@ def load_openai_model(
     elif os.path.isfile(name):
         model_path = name
     else:
-        raise RuntimeError(
-            f"Model {name} not found; available models = {list_openai_models()}"
-        )
+        raise RuntimeError(f"Model {name} not found; available models = {list_openai_models()}")
 
     try:
         # loading JIT archive
@@ -1084,17 +993,13 @@ def load_openai_model(
     except RuntimeError:
         # loading saved state dict
         if jit:
-            warnings.warn(
-                f"File {model_path} is not a JIT archive. Loading as a state dict instead"
-            )
+            warnings.warn(f"File {model_path} is not a JIT archive. Loading as a state dict instead")
             jit = False
         state_dict = torch.load(model_path, map_location="cpu")
 
     if not jit:
         try:
-            model = build_model_from_openai_state_dict(
-                state_dict or model.state_dict()
-            ).to(device)
+            model = build_model_from_openai_state_dict(state_dict or model.state_dict()).to(device)
         except KeyError:
             sd = {k[7:]: v for k, v in state_dict["state_dict"].items()}
             model = build_model_from_openai_state_dict(sd).to(device)
@@ -1104,14 +1009,8 @@ def load_openai_model(
         return model
 
     # patch the device names
-    device_holder = torch.jit.trace(
-        lambda: torch.ones([]).to(torch.device(device)), example_inputs=[]
-    )
-    device_node = [
-        n
-        for n in device_holder.graph.findAllNodes("prim::Constant")
-        if "Device" in repr(n)
-    ][-1]
+    device_holder = torch.jit.trace(lambda: torch.ones([]).to(torch.device(device)), example_inputs=[])
+    device_node = [n for n in device_holder.graph.findAllNodes("prim::Constant") if "Device" in repr(n)][-1]
 
     def patch_device(module):
         try:
@@ -1124,9 +1023,7 @@ def load_openai_model(
 
         for graph in graphs:
             for node in graph.findAllNodes("prim::Constant"):
-                if "value" in node.attributeNames() and str(node["value"]).startswith(
-                    "cuda"
-                ):
+                if "value" in node.attributeNames() and str(node["value"]).startswith("cuda"):
                     node.copyAttributes(device_node)
 
     model.apply(patch_device)
@@ -1135,9 +1032,7 @@ def load_openai_model(
 
     # patch dtype to float32 on CPU
     if str(device) == "cpu":
-        float_holder = torch.jit.trace(
-            lambda: torch.ones([]).float(), example_inputs=[]
-        )
+        float_holder = torch.jit.trace(lambda: torch.ones([]).float(), example_inputs=[])
         float_input = list(float_holder.graph.findNode("aten::to").inputs())[1]
         float_node = float_input.node()
 

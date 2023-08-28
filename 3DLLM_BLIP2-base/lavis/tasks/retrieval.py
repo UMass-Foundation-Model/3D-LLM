@@ -52,7 +52,6 @@ class RetrievalTask(BaseTask):
     @staticmethod
     @torch.no_grad()
     def _report_metrics(scores_i2t, scores_t2i, txt2img, img2txt):
-
         # Images->Text
         ranks = np.zeros(scores_i2t.shape[0])
         for index, score in enumerate(scores_i2t):

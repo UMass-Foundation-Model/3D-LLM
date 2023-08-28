@@ -82,9 +82,7 @@ class BlipNLVR(BlipBase, MomentumDistilationMixin):
             odict_keys(['intermediate_output', 'loss'])
         """
         text = samples["text_input"]
-        text = self.tokenizer(text, padding="longest", return_tensors="pt").to(
-            self.device
-        )
+        text = self.tokenizer(text, padding="longest", return_tensors="pt").to(self.device)
         text.input_ids[:, 0] = self.tokenizer.enc_token_id
 
         targets = samples["label"]
@@ -94,9 +92,7 @@ class BlipNLVR(BlipBase, MomentumDistilationMixin):
         images = torch.cat([image0, image1], dim=0)
 
         image_embeds = self.visual_encoder.forward_features(images)
-        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-            self.device
-        )
+        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.device)
         image0_embeds, image1_embeds = torch.split(image_embeds, targets.size(0))
 
         encoder_output = self.text_encoder(
@@ -139,9 +135,7 @@ class BlipNLVR(BlipBase, MomentumDistilationMixin):
 
         num_classes = cfg.get("num_classes", 3)
 
-        assert num_classes > 1, "Invalid number of classes provided, found {}".format(
-            num_classes
-        )
+        assert num_classes > 1, "Invalid number of classes provided, found {}".format(num_classes)
 
         model = cls(
             image_encoder=image_encoder,
@@ -155,9 +149,7 @@ class BlipNLVR(BlipBase, MomentumDistilationMixin):
 
     def load_from_pretrained(self, url_or_filename):
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location="cpu")
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location="cpu")

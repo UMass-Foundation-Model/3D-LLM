@@ -179,11 +179,7 @@ class BaseTask:
         metric_logger.add_meter("loss", SmoothedValue(window_size=1, fmt="{value:.4f}"))
 
         # if iter-based runner, schedule lr based on inner epoch.
-        logging.info(
-            "Start training epoch {}, {} iters per inner epoch.".format(
-                epoch, iters_per_epoch
-            )
-        )
+        logging.info("Start training epoch {}, {} iters per inner epoch.".format(epoch, iters_per_epoch))
         header = "Train: data epoch: [{}]".format(epoch)
         if start_iters is None:
             # epoch-based runner
@@ -232,18 +228,13 @@ class BaseTask:
         # gather the stats from all processes
         metric_logger.synchronize_between_processes()
         logging.info("Averaged stats: " + str(metric_logger.global_avg()))
-        return {
-            k: "{:.3f}".format(meter.global_avg)
-            for k, meter in metric_logger.meters.items()
-        }
+        return {k: "{:.3f}".format(meter.global_avg) for k, meter in metric_logger.meters.items()}
 
     @staticmethod
     def save_result(result, result_dir, filename, remove_duplicate=""):
         import json
 
-        result_file = os.path.join(
-            result_dir, "%s_rank%d.json" % (filename, get_rank())
-        )
+        result_file = os.path.join(result_dir, "%s_rank%d.json" % (filename, get_rank()))
         final_result_file = os.path.join(result_dir, "%s.json" % filename)
 
         json.dump(result, open(result_file, "w"))
@@ -257,9 +248,7 @@ class BaseTask:
             result = []
 
             for rank in range(get_world_size()):
-                result_file = os.path.join(
-                    result_dir, "%s_rank%d.json" % (filename, rank)
-                )
+                result_file = os.path.join(result_dir, "%s_rank%d.json" % (filename, rank))
                 res = json.load(open(result_file, "r"))
                 result += res
 

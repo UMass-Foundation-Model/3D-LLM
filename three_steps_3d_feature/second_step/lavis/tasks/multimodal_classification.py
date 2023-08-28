@@ -56,9 +56,7 @@ class MultimodalClassificationTask(BaseTask):
             remove_duplicate=self.inst_id_key,
         )
 
-        metrics = self._report_metrics(
-            eval_result_file=eval_result_file, split_name=split_name
-        )
+        metrics = self._report_metrics(eval_result_file=eval_result_file, split_name=split_name)
 
         return metrics
 
@@ -74,9 +72,7 @@ class MultimodalClassificationTask(BaseTask):
 
         log_stats = {split_name: {k: v for k, v in metrics.items()}}
 
-        with open(
-            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-        ) as f:
+        with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
             f.write(json.dumps(log_stats) + "\n")
 
         logging.info(metrics)

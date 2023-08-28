@@ -220,9 +220,7 @@ class VQAEval:
                 for ansDic in gts[quesId]["answers"]:
                     ansDic["answer"] = self.processPunctuation(ansDic["answer"])
             for gtAnsDatum in gts[quesId]["answers"]:
-                otherGTAns = [
-                    item for item in gts[quesId]["answers"] if item != gtAnsDatum
-                ]
+                otherGTAns = [item for item in gts[quesId]["answers"] if item != gtAnsDatum]
                 matchingAns = [item for item in otherGTAns if item["answer"] == resAns]
                 acc = min(1, float(len(matchingAns)) / 3)
                 gtAcc.append(acc)
@@ -249,9 +247,7 @@ class VQAEval:
     def processPunctuation(self, inText):
         outText = inText
         for p in self.punct:
-            if (p + " " in inText or " " + p in inText) or (
-                re.search(self.commaStrip, inText) != None
-            ):
+            if (p + " " in inText or " " + p in inText) or (re.search(self.commaStrip, inText) != None):
                 outText = outText.replace(p, "")
             else:
                 outText = outText.replace(p, " ")
@@ -283,9 +279,7 @@ class VQAEval:
             for quesType in accQuesType
         }
         self.accuracy["perAnswerType"] = {
-            ansType: round(
-                100 * float(sum(accAnsType[ansType])) / len(accAnsType[ansType]), self.n
-            )
+            ansType: round(100 * float(sum(accAnsType[ansType])) / len(accAnsType[ansType]), self.n)
             for ansType in accAnsType
         }
 

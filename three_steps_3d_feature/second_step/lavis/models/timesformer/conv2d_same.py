@@ -20,12 +20,11 @@ from typing import List, Tuple
 
 from .vit_utils import is_static_pad, get_padding
 
+
 # Dynamically pad input x with 'SAME' padding for conv with specified args
 def pad_same(x, k: List[int], s: List[int], d: List[int] = (1, 1), value: float = 0):
     ih, iw = x.size()[-2:]
-    pad_h, pad_w = get_same_padding(ih, k[0], s[0], d[0]), get_same_padding(
-        iw, k[1], s[1], d[1]
-    )
+    pad_h, pad_w = get_same_padding(ih, k[0], s[0], d[0]), get_same_padding(iw, k[1], s[1], d[1])
     if pad_h > 0 or pad_w > 0:
         x = F.pad(
             x,
@@ -90,9 +89,7 @@ class Conv2dSame(nn.Conv2d):
         groups=1,
         bias=True,
     ):
-        super(Conv2dSame, self).__init__(
-            in_channels, out_channels, kernel_size, stride, 0, dilation, groups, bias
-        )
+        super(Conv2dSame, self).__init__(in_channels, out_channels, kernel_size, stride, 0, dilation, groups, bias)
 
     def forward(self, x):
         return conv2d_same(

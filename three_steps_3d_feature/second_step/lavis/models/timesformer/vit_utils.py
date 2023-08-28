@@ -96,6 +96,7 @@ def _ntuple(n):
 
 to_2tuple = _ntuple(2)
 
+
 # Calculate symmetric padding for a convolution
 def get_padding(kernel_size: int, stride: int = 1, dilation: int = 1, **_) -> int:
     padding = ((stride - 1) + dilation * (kernel_size - 1)) // 2
@@ -139,9 +140,7 @@ def is_static_pad(kernel_size: int, stride: int = 1, dilation: int = 1, **_):
 # def pad_same(x, k: List[int], s: List[int], d: List[int] = (1, 1), value: float = 0):
 def pad_same(x, k, s, d=(1, 1), value=0):
     ih, iw = x.size()[-2:]
-    pad_h, pad_w = get_same_padding(ih, k[0], s[0], d[0]), get_same_padding(
-        iw, k[1], s[1], d[1]
-    )
+    pad_h, pad_w = get_same_padding(ih, k[0], s[0], d[0]), get_same_padding(iw, k[1], s[1], d[1])
     if pad_h > 0 or pad_w > 0:
         x = F.pad(
             x,
@@ -169,9 +168,7 @@ def drop_path(x, drop_prob: float = 0.0, training: bool = False):
     if drop_prob == 0.0 or not training:
         return x
     keep_prob = 1 - drop_prob
-    shape = (x.shape[0],) + (1,) * (
-        x.ndim - 1
-    )  # work with diff dim tensors, not just 2D ConvNets
+    shape = (x.shape[0],) + (1,) * (x.ndim - 1)  # work with diff dim tensors, not just 2D ConvNets
     random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
     random_tensor.floor_()  # binarize
     output = x.div(keep_prob) * random_tensor

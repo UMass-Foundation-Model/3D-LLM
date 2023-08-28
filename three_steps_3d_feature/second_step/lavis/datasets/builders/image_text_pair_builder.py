@@ -17,18 +17,14 @@ from lavis.datasets.datasets.laion_dataset import LaionDataset
 class ConceptualCaption3MBuilder(BaseDatasetBuilder):
     train_dataset_cls = ImageTextPairDataset
 
-    DATASET_CONFIG_DICT = {
-        "default": "configs/datasets/conceptual_caption/defaults_3m.yaml"
-    }
+    DATASET_CONFIG_DICT = {"default": "configs/datasets/conceptual_caption/defaults_3m.yaml"}
 
 
 @registry.register_builder("conceptual_caption_12m")
 class ConceptualCaption12MBuilder(BaseDatasetBuilder):
     train_dataset_cls = ImageTextPairDataset
 
-    DATASET_CONFIG_DICT = {
-        "default": "configs/datasets/conceptual_caption/defaults_12m.yaml"
-    }
+    DATASET_CONFIG_DICT = {"default": "configs/datasets/conceptual_caption/defaults_12m.yaml"}
 
 
 @registry.register_builder("sbu_caption")

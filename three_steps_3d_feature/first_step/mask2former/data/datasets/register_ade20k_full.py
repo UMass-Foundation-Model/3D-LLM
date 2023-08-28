@@ -948,9 +948,7 @@ def register_all_ade20k_full(root):
         image_dir = os.path.join(root, "images_detectron2", dirname)
         gt_dir = os.path.join(root, "annotations_detectron2", dirname)
         name = f"ade20k_full_sem_seg_{name}"
-        DatasetCatalog.register(
-            name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="tif", image_ext="jpg")
-        )
+        DatasetCatalog.register(name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="tif", image_ext="jpg"))
         MetadataCatalog.get(name).set(
             stuff_classes=meta["stuff_classes"][:],
             image_root=image_dir,

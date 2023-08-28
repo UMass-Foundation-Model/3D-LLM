@@ -60,9 +60,7 @@ class RandomResizedCropVideo(RandomResizedCrop):
     ):
         if isinstance(size, tuple):
             if len(size) != 2:
-                raise ValueError(
-                    f"size should be tuple (height, width), instead got {size}"
-                )
+                raise ValueError(f"size should be tuple (height, width), instead got {size}")
             self.size = size
         else:
             self.size = (size, size)

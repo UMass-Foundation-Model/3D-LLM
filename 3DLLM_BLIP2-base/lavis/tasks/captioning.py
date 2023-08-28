@@ -80,7 +80,6 @@ class CaptionTask(BaseTask):
 
     @main_process
     def _report_metrics(self, eval_result_file, split_name):
-
         # TODO better way to define this
         coco_gt_root = os.path.join(registry.get_path("cache_root"), "coco_gt")
         coco_val = coco_caption_eval(coco_gt_root, eval_result_file, split_name)

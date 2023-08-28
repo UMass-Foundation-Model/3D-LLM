@@ -69,9 +69,7 @@ class TimmModel(nn.Module):
 
         head_layers = OrderedDict()
         if pool == "abs_attn":
-            head_layers["pool"] = AttentionPool2d(
-                prev_chs, feat_size=feat_size, out_features=embed_dim
-            )
+            head_layers["pool"] = AttentionPool2d(prev_chs, feat_size=feat_size, out_features=embed_dim)
             prev_chs = embed_dim
         elif pool == "rot_attn":
             head_layers["pool"] = RotAttentionPool2d(prev_chs, out_features=embed_dim)
@@ -165,11 +163,7 @@ class RotAttentionPool2d(nn.Module):
 
         x = torch.cat([x.mean(1, keepdim=True), x], dim=1)
 
-        x = (
-            self.qkv(x)
-            .reshape(B, N + 1, 3, self.num_heads, self.head_dim)
-            .permute(2, 0, 3, 1, 4)
-        )
+        x = self.qkv(x).reshape(B, N + 1, 3, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
         q, k, v = x[0], x[1], x[2]
 
         qc, q = q[:, :, :1], q[:, :, 1:]
@@ -233,11 +227,7 @@ class AttentionPool2d(nn.Module):
         x = torch.cat([x.mean(1, keepdim=True), x], dim=1)
         x = x + self.pos_embed.unsqueeze(0).to(x.dtype)
 
-        x = (
-            self.qkv(x)
-            .reshape(B, N + 1, 3, self.num_heads, self.head_dim)
-            .permute(2, 0, 3, 1, 4)
-        )
+        x = self.qkv(x).reshape(B, N + 1, 3, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
         q, k, v = x[0], x[1], x[2]
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
@@ -257,9 +247,7 @@ def pixel_freq_bands(
     if linear_bands:
         bands = torch.linspace(1.0, max_freq / 2, num_bands, dtype=dtype, device=device)
     else:
-        bands = 2 ** torch.linspace(
-            0, math.log(max_freq, 2) - 1, num_bands, dtype=dtype, device=device
-        )
+        bands = 2 ** torch.linspace(0, math.log(max_freq, 2) - 1, num_bands, dtype=dtype, device=device)
     return bands * torch.pi
 
 
@@ -270,10 +258,7 @@ def inv_freq_bands(
     dtype: torch.dtype = torch.float32,
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
-    inv_freq = 1.0 / (
-        temperature
-        ** (torch.arange(0, num_bands, step, dtype=dtype, device=device) / num_bands)
-    )
+    inv_freq = 1.0 / (temperature ** (torch.arange(0, num_bands, step, dtype=dtype, device=device) / num_bands))
     return inv_freq
 
 
@@ -297,31 +282,21 @@ def build_sincos2d_pos_embed(
         device:
     Returns:
     """
-    assert (
-        dim % 4 == 0
-    ), "Embed dimension must be divisible by 4 for sin-cos 2D position embedding"
+    assert dim % 4 == 0, "Embed dimension must be divisible by 4 for sin-cos 2D position embedding"
     pos_dim = dim // 4
-    bands = inv_freq_bands(
-        pos_dim, temperature=temperature, step=1, dtype=dtype, device=device
-    )
+    bands = inv_freq_bands(pos_dim, temperature=temperature, step=1, dtype=dtype, device=device)
 
     if reverse_coord:
         feat_shape = feat_shape[::-1]  # stack W, H instead of H, W
     grid = (
-        torch.stack(
-            torch.meshgrid(
-                [torch.arange(s, device=device, dtype=dtype) for s in feat_shape]
-            )
-        )
+        torch.stack(torch.meshgrid([torch.arange(s, device=device, dtype=dtype) for s in feat_shape]))
         .flatten(1)
         .transpose(0, 1)
     )
     pos2 = grid.unsqueeze(-1) * bands.unsqueeze(0)
     # FIXME add support for unflattened spatial dim?
 
-    stack_dim = (
-        2 if interleave_sin_cos else 1
-    )  # stack sin, cos, sin, cos  instead of sin sin cos cos
+    stack_dim = 2 if interleave_sin_cos else 1  # stack sin, cos, sin, cos  instead of sin sin cos cos
     pos_emb = torch.stack([torch.sin(pos2), torch.cos(pos2)], dim=stack_dim).flatten(1)
     return pos_emb
 
@@ -357,19 +332,12 @@ def build_fourier_pos_embed(
 
     if in_pixels:
         grid = torch.stack(
-            torch.meshgrid(
-                [
-                    torch.linspace(-1.0, 1.0, steps=s, device=device, dtype=dtype)
-                    for s in feat_shape
-                ]
-            ),
+            torch.meshgrid([torch.linspace(-1.0, 1.0, steps=s, device=device, dtype=dtype) for s in feat_shape]),
             dim=-1,
         )
     else:
         grid = torch.stack(
-            torch.meshgrid(
-                [torch.arange(s, device=device, dtype=dtype) for s in feat_shape]
-            ),
+            torch.meshgrid([torch.arange(s, device=device, dtype=dtype) for s in feat_shape]),
             dim=-1,
         )
     grid = grid.unsqueeze(-1)
@@ -396,9 +364,7 @@ class FourierEmbed(nn.Module):
         self.num_bands = num_bands
         self.concat_grid = concat_grid
         self.keep_spatial = keep_spatial
-        self.register_buffer(
-            "bands", pixel_freq_bands(max_res, num_bands), persistent=False
-        )
+        self.register_buffer("bands", pixel_freq_bands(max_res, num_bands), persistent=False)
 
     def forward(self, x):
         B, C = x.shape[:2]
@@ -415,13 +381,9 @@ class FourierEmbed(nn.Module):
 
         # FIXME support nD
         if self.keep_spatial:
-            x = torch.cat(
-                [x, emb.unsqueeze(0).expand(batch_expand).permute(0, 3, 1, 2)], dim=1
-            )
+            x = torch.cat([x, emb.unsqueeze(0).expand(batch_expand).permute(0, 3, 1, 2)], dim=1)
         else:
-            x = torch.cat(
-                [x.permute(0, 2, 3, 1), emb.unsqueeze(0).expand(batch_expand)], dim=-1
-            )
+            x = torch.cat([x.permute(0, 2, 3, 1), emb.unsqueeze(0).expand(batch_expand)], dim=-1)
             x = x.reshape(B, feat_shape.numel(), -1)
 
         return x

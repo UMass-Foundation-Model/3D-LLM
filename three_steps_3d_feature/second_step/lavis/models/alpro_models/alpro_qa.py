@@ -28,9 +28,7 @@ class AlproQA(AlproBase):
         "msvd": "configs/models/alpro_qa_msvd.yaml",
     }
 
-    def __init__(
-        self, visual_encoder, text_encoder, hidden_size, num_classes, max_txt_len=40
-    ):
+    def __init__(self, visual_encoder, text_encoder, hidden_size, num_classes, max_txt_len=40):
         super().__init__()
 
         self.tokenizer = self.init_tokenizer()
@@ -66,18 +64,14 @@ class AlproQA(AlproBase):
 
         text_output = self.text_encoder.forward_text(
             text,
-            token_type_ids=torch.zeros(
-                text.input_ids.shape, dtype=torch.long, device=self.device
-            ),
+            token_type_ids=torch.zeros(text.input_ids.shape, dtype=torch.long, device=self.device),
         )
         text_embeds = text_output.last_hidden_state
 
         # forward visual
         # timeSformer asks for (b, c, t, h, w) as input.
         video_embeds = self.visual_encoder.forward_features(visual_inputs)
-        video_atts = torch.ones(video_embeds.size()[:-1], dtype=torch.long).to(
-            self.device
-        )
+        video_atts = torch.ones(video_embeds.size()[:-1], dtype=torch.long).to(self.device)
 
         # forward cross-encoder
         attention_mask = torch.cat([text.attention_mask, video_atts], dim=1)
@@ -129,13 +123,9 @@ class AlproQA(AlproBase):
             num_classes=num_classes,
         )
 
-        num_patches = (
-            visual_encoder_config["image_size"] // visual_encoder_config["patch_size"]
-        ) ** 2
+        num_patches = (visual_encoder_config["image_size"] // visual_encoder_config["patch_size"]) ** 2
         num_frames = visual_encoder_config["n_frms"]
 
-        model.load_checkpoint_from_config(
-            cfg, num_frames=num_frames, num_patches=num_patches
-        )
+        model.load_checkpoint_from_config(cfg, num_frames=num_frames, num_patches=num_patches)
 
         return model

@@ -122,9 +122,7 @@ class MaskFormerPanopticDatasetMapper(MaskFormerSemanticDatasetMapper):
             image = F.pad(image, padding_size, value=128).contiguous()
             if sem_seg_gt is not None:
                 sem_seg_gt = F.pad(sem_seg_gt, padding_size, value=self.ignore_label).contiguous()
-            pan_seg_gt = F.pad(
-                pan_seg_gt, padding_size, value=0
-            ).contiguous()  # 0 is the VOID panoptic label
+            pan_seg_gt = F.pad(pan_seg_gt, padding_size, value=0).contiguous()  # 0 is the VOID panoptic label
 
         image_shape = (image.shape[-2], image.shape[-1])  # h, w
 
@@ -155,9 +153,7 @@ class MaskFormerPanopticDatasetMapper(MaskFormerSemanticDatasetMapper):
             # Some image does not have annotation (all ignored)
             instances.gt_masks = torch.zeros((0, pan_seg_gt.shape[-2], pan_seg_gt.shape[-1]))
         else:
-            masks = BitMasks(
-                torch.stack([torch.from_numpy(np.ascontiguousarray(x.copy())) for x in masks])
-            )
+            masks = BitMasks(torch.stack([torch.from_numpy(np.ascontiguousarray(x.copy())) for x in masks]))
             instances.gt_masks = masks.tensor
 
         dataset_dict["instances"] = instances

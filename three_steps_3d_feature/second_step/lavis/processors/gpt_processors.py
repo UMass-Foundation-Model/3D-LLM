@@ -51,18 +51,14 @@ class GPTDialogueProcessor(BaseProcessor):
         self.tokenizer.add_special_tokens(SPECIAL_TOKENS_DICT)
 
     def sample_sequence(self, caption, history, answer):
-        bos, eos, speaker1, speaker2, cap = self.tokenizer.convert_tokens_to_ids(
-            SPECIAL_TOKENS[:-2]
-        )
+        bos, eos, speaker1, speaker2, cap = self.tokenizer.convert_tokens_to_ids(SPECIAL_TOKENS[:-2])
         instance = {}
         sequence = [caption] + history + [answer]
         sequence = [s + [eos] for s in sequence]
 
         instance["input_ids"] = list(chain(*sequence))
         instance["token_type_ids"] = [cap] * len(sequence[0]) + [
-            speaker2 if i % 2 else speaker1
-            for i, s in enumerate(sequence[1:])
-            for _ in s
+            speaker2 if i % 2 else speaker1 for i, s in enumerate(sequence[1:]) for _ in s
         ]
         instance["labels"] = ([-1] * sum(len(s) for s in sequence[:-1])) + sequence[-1]
 
@@ -77,9 +73,7 @@ class GPTDialogueProcessor(BaseProcessor):
     def padding(self, seq, pad_token=-1):
         if pad_token == -1:
             pad_token = self.tokenizer.pad_token_id
-        padded_seq = torch.nn.utils.rnn.pad_sequence(
-            seq, batch_first=True, padding_value=pad_token
-        )
+        padded_seq = torch.nn.utils.rnn.pad_sequence(seq, batch_first=True, padding_value=pad_token)
         return padded_seq
 
     def get_attention_mask(self, seq, pad_token=-1):
@@ -126,9 +120,7 @@ class GPTVideoFeatureProcessor(GPTVideoFeatureBaseProcessor):
         self.tokenizer.add_special_tokens(SPECIAL_TOKENS_DICT)
 
     def padding(self, seq):
-        padded_seq = torch.nn.utils.rnn.pad_sequence(
-            seq, batch_first=True, padding_value=1.0
-        )
+        padded_seq = torch.nn.utils.rnn.pad_sequence(seq, batch_first=True, padding_value=1.0)
         return padded_seq
 
     def get_attention_mask(self, seq):
@@ -154,9 +146,7 @@ class GPTVideoFeatureProcessor(GPTVideoFeatureBaseProcessor):
         item["video_fts"] = torch.Tensor(sampled_ft)
 
         video_type_token = self.tokenizer.convert_tokens_to_ids("<video>")
-        item["token_type_ids"] = torch.Tensor(
-            [video_type_token] * len(sampled_ft)
-        ).long()
+        item["token_type_ids"] = torch.Tensor([video_type_token] * len(sampled_ft)).long()
 
         return item
 

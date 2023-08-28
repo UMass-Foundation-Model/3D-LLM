@@ -134,11 +134,7 @@ def load_preprocess(config):
     """
 
     def _build_proc_from_cfg(cfg):
-        return (
-            registry.get_processor_class(cfg.name).from_config(cfg)
-            if cfg is not None
-            else BaseProcessor()
-        )
+        return registry.get_processor_class(cfg.name).from_config(cfg) if cfg is not None else BaseProcessor()
 
     vis_processors = dict()
     txt_processors = dict()
@@ -230,8 +226,7 @@ class ModelZoo:
 
     def __init__(self) -> None:
         self.model_zoo = {
-            k: list(v.PRETRAINED_MODEL_CONFIG_DICT.keys())
-            for k, v in registry.mapping["model_name_mapping"].items()
+            k: list(v.PRETRAINED_MODEL_CONFIG_DICT.keys()) for k, v in registry.mapping["model_name_mapping"].items()
         }
 
     def __str__(self) -> str:
@@ -241,12 +236,7 @@ class ModelZoo:
             + f"{'Architectures':<30} {'Types'}\n"
             + "=" * 50
             + "\n"
-            + "\n".join(
-                [
-                    f"{name:<30} {', '.join(types)}"
-                    for name, types in self.model_zoo.items()
-                ]
-            )
+            + "\n".join([f"{name:<30} {', '.join(types)}" for name, types in self.model_zoo.items()])
         )
 
     def __iter__(self):

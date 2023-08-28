@@ -76,11 +76,7 @@ class BaseDatasetBuilder:
 
     @staticmethod
     def _build_proc_from_cfg(cfg):
-        return (
-            registry.get_processor_class(cfg.name).from_config(cfg)
-            if cfg is not None
-            else None
-        )
+        return registry.get_processor_class(cfg.name).from_config(cfg) if cfg is not None else None
 
     @classmethod
     def default_config_path(cls, type="default"):
@@ -138,9 +134,7 @@ class BaseDatasetBuilder:
                     if os.path.isdir(storage_path):
                         # if only dirname is provided, suffix with basename of URL.
                         raise ValueError(
-                            "Expecting storage_path to be a file path, got directory {}".format(
-                                storage_path
-                            )
+                            "Expecting storage_path to be a file path, got directory {}".format(storage_path)
                         )
                     else:
                         filename = os.path.basename(storage_path)
@@ -148,7 +142,6 @@ class BaseDatasetBuilder:
                     download_url(url=url_or_filename, root=dirname, filename=filename)
 
     def _download_vis(self):
-
         storage_path = self.config.build_info.get(self.data_type).storage
         storage_path = utils.get_cache_path(storage_path)
 
@@ -182,16 +175,8 @@ class BaseDatasetBuilder:
             is_train = split == "train"
 
             # processors
-            vis_processor = (
-                self.vis_processors["train"]
-                if is_train
-                else self.vis_processors["eval"]
-            )
-            text_processor = (
-                self.text_processors["train"]
-                if is_train
-                else self.text_processors["eval"]
-            )
+            vis_processor = self.vis_processors["train"] if is_train else self.vis_processors["eval"]
+            text_processor = self.text_processors["train"] if is_train else self.text_processors["eval"]
 
             # annotation path
             ann_paths = ann_info.get(split).storage

@@ -21,7 +21,6 @@ class VideoCaptionDataset(CaptionDataset):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         vname = ann["video"]
@@ -48,7 +47,6 @@ class VideoCaptionEvalDataset(BaseDataset):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
 
     def __getitem__(self, index):
-
         ann = self.annotation[index]
 
         vname = ann["video"]

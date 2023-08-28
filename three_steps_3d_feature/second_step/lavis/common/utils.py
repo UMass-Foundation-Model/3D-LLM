@@ -115,7 +115,6 @@ def download_google_drive_url(url: str, output_path: str, output_file_name: str)
     import requests
 
     with requests.Session() as session:
-
         # First get the confirmation token and append it to the URL
         with session.get(url, stream=True, allow_redirects=True) as response:
             for k, v in response.cookies.items():
@@ -131,9 +130,7 @@ def download_google_drive_url(url: str, output_path: str, output_file_name: str)
                 from tqdm import tqdm
 
                 with tqdm(total=total_size) as progress_bar:
-                    for block in response.iter_content(
-                        chunk_size=io.DEFAULT_BUFFER_SIZE
-                    ):
+                    for block in response.iter_content(chunk_size=io.DEFAULT_BUFFER_SIZE):
                         file.write(block)
                         progress_bar.update(len(block))
 
@@ -153,9 +150,7 @@ def _get_google_drive_file_id(url: str) -> Optional[str]:
 
 def _urlretrieve(url: str, filename: str, chunk_size: int = 1024) -> None:
     with open(filename, "wb") as fh:
-        with urllib.request.urlopen(
-            urllib.request.Request(url, headers={"User-Agent": "vissl"})
-        ) as response:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "vissl"})) as response:
             with tqdm(total=response.length) as pbar:
                 for chunk in iter(lambda: response.read(chunk_size), ""):
                     if not chunk:
@@ -205,10 +200,7 @@ def download_url(
     except (urllib.error.URLError, IOError) as e:  # type: ignore[attr-defined]
         if url[:5] == "https":
             url = url.replace("https:", "http:")
-            print(
-                "Failed download. Trying https -> http instead."
-                " Downloading " + url + " to " + fpath
-            )
+            print("Failed download. Trying https -> http instead." " Downloading " + url + " to " + fpath)
             _urlretrieve(url, fpath)
         else:
             raise e
@@ -340,9 +332,7 @@ def load_file(filename, mmap_mode=None, verbose=True, allow_pickle=False):
                         mmap_mode=mmap_mode,
                     )
             except ValueError as e:
-                logging.info(
-                    f"Could not mmap {filename}: {e}. Trying without g_pathmgr"
-                )
+                logging.info(f"Could not mmap {filename}: {e}. Trying without g_pathmgr")
                 data = np.load(
                     filename,
                     allow_pickle=allow_pickle,

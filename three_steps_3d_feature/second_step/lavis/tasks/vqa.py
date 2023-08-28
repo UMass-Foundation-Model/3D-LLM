@@ -70,10 +70,7 @@ class VQATask(BaseTask):
         # get question file, annotation file and anwser list in COCO format
         for dataset in datasets.values():
             for split in dataset:
-                if (
-                    hasattr(dataset[split], "coco_fmt_qust_file")
-                    and dataset[split].coco_fmt_qust_file is not None
-                ):
+                if hasattr(dataset[split], "coco_fmt_qust_file") and dataset[split].coco_fmt_qust_file is not None:
                     self.ques_files[split] = dataset[split].coco_fmt_qust_file
                     self.anno_files[split] = dataset[split].coco_fmt_anno_file
 
@@ -84,9 +81,7 @@ class VQATask(BaseTask):
                     pass
 
         if len(self.ques_files) > 0:
-            assert len(self.ques_files) == len(
-                self.anno_files
-            ), "Only support one split for evaluation."
+            assert len(self.ques_files) == len(self.anno_files), "Only support one split for evaluation."
 
         return datasets
 
@@ -131,9 +126,7 @@ class VQATask(BaseTask):
 
         if split in self.ques_files and split in self.anno_files:
             vqa = VQA(self.anno_files[split], self.ques_files[split])
-            vqa_result = vqa.loadRes(
-                resFile=result_file, quesFile=self.ques_files[split]
-            )
+            vqa_result = vqa.loadRes(resFile=result_file, quesFile=self.ques_files[split])
 
             # create vqaEval object by taking vqa and vqaRes
             # n is precision of accuracy (number of places after decimal), default is 2
@@ -149,15 +142,10 @@ class VQATask(BaseTask):
             logging.info("Per Answer Type Accuracy is the following:")
 
             for ans_type in vqa_scorer.accuracy["perAnswerType"]:
-                logging.info(
-                    "%s : %.02f"
-                    % (ans_type, vqa_scorer.accuracy["perAnswerType"][ans_type])
-                )
+                logging.info("%s : %.02f" % (ans_type, vqa_scorer.accuracy["perAnswerType"][ans_type]))
                 metrics[ans_type] = vqa_scorer.accuracy["perAnswerType"][ans_type]
 
-            with open(
-                    os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-            ) as f:
+            with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
                 f.write(json.dumps(metrics) + "\n")
 
         return metrics
@@ -182,9 +170,7 @@ class AOKVQATask(VQATask):
         gt_answers = samples["direct_answers"]
 
         for pred_answer, ques_id, gt_answer in zip(answers, question_id, gt_answers):
-            pred_qa_pairs.append(
-                {"question_id": ques_id, "pred_ans": pred_answer, "gt_ans": gt_answer}
-            )
+            pred_qa_pairs.append({"question_id": ques_id, "pred_ans": pred_answer, "gt_ans": gt_answer})
 
         return pred_qa_pairs
 
@@ -216,9 +202,7 @@ class AOKVQATask(VQATask):
         accuracy = sum(acc) / len(acc) * 100
         metrics = {"agg_metrics": accuracy, "acc": accuracy}
 
-        with open(
-            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-        ) as f:
+        with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
             f.write(json.dumps(metrics) + "\n")
 
         logging.info(metrics)

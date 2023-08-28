@@ -108,16 +108,10 @@ class Attention(nn.Module):
     def forward(self, x):
         B, N, C = x.shape
         if self.with_qkv:
-            qkv = (
-                self.qkv(x)
-                .reshape(B, N, 3, self.num_heads, C // self.num_heads)
-                .permute(2, 0, 3, 1, 4)
-            )
+            qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
             q, k, v = qkv[0], qkv[1], qkv[2]
         else:
-            qkv = x.reshape(B, N, self.num_heads, C // self.num_heads).permute(
-                0, 2, 1, 3
-            )
+            qkv = x.reshape(B, N, self.num_heads, C // self.num_heads).permute(0, 2, 1, 3)
             q, k, v = qkv, qkv, qkv
 
         attn = (q @ k.transpose(-2, -1)) * self.scale
@@ -216,9 +210,7 @@ class Block(nn.Module):
 
             res_temporal = self.drop_path(temporal_attn_out)
 
-            res_temporal = rearrange(
-                res_temporal, "(b h w) t m -> b (h w t) m", b=B, h=H, w=W, t=T
-            )
+            res_temporal = rearrange(res_temporal, "(b h w) t m -> b (h w t) m", b=B, h=H, w=W, t=T)
             res_temporal = self.temporal_fc(res_temporal)
             xt = x[:, 1:, :] + res_temporal
 
@@ -239,9 +231,7 @@ class Block(nn.Module):
             # averaging for every frame
             cls_token = torch.mean(cls_token, 1, True)
             res_spatial = res_spatial[:, 1:, :]
-            res_spatial = rearrange(
-                res_spatial, "(b t) (h w) m -> b (h w t) m", b=B, h=H, w=W, t=T
-            )
+            res_spatial = rearrange(res_spatial, "(b t) (h w) m -> b (h w t) m", b=B, h=H, w=W, t=T)
             res = res_spatial
             x = xt
 
@@ -272,9 +262,7 @@ class PatchEmbed(nn.Module):
         self.patch_size = patch_size
         self.num_patches = num_patches
 
-        self.proj = nn.Conv2d(
-            in_chans, embed_dim, kernel_size=patch_size, stride=patch_size
-        )
+        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
 
     def forward(self, x):
         B, C, T, H, W = x.shape
@@ -336,16 +324,12 @@ class VisionTransformer(nn.Module):
             self.time_drop = nn.Dropout(p=drop_rate)
 
         # Attention Blocks
-        dpr = [
-            x.item() for x in torch.linspace(0, drop_path_rate, self.depth)
-        ]  # stochastic depth decay rule
+        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, self.depth)]  # stochastic depth decay rule
         self.blocks = nn.ModuleList(
             [
                 Block(
                     layer_num=i,
-                    use_grad_checkpointing=(
-                        use_grad_checkpointing and i >= self.depth - ckpt_layer
-                    ),
+                    use_grad_checkpointing=(use_grad_checkpointing and i >= self.depth - ckpt_layer),
                     dim=embed_dim,
                     num_heads=num_heads,
                     mlp_ratio=mlp_ratio,
@@ -363,9 +347,7 @@ class VisionTransformer(nn.Module):
         self.norm = norm_layer(embed_dim)
 
         # Classifier head
-        self.head = (
-            nn.Linear(embed_dim, num_classes) if num_classes > 0 else nn.Identity()
-        )
+        self.head = nn.Linear(embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
         trunc_normal_(self.pos_embed, std=0.02)
         trunc_normal_(self.cls_token, std=0.02)
@@ -400,9 +382,7 @@ class VisionTransformer(nn.Module):
 
     def reset_classifier(self, num_classes, global_pool=""):
         self.num_classes = num_classes
-        self.head = (
-            nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
-        )
+        self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def remove_classifier(self):
         self.num_classes = 0
@@ -504,9 +484,7 @@ class vit_base_patch16_224(nn.Module):
 
         self.attention_type = cfg.TIMESFORMER.ATTENTION_TYPE
         self.model.default_cfg = default_cfgs["vit_base_patch16_224"]
-        self.num_patches = (cfg.DATA.TRAIN_CROP_SIZE // patch_size) * (
-            cfg.DATA.TRAIN_CROP_SIZE // patch_size
-        )
+        self.num_patches = (cfg.DATA.TRAIN_CROP_SIZE // patch_size) * (cfg.DATA.TRAIN_CROP_SIZE // patch_size)
         pretrained_model = cfg.TIMESFORMER.PRETRAINED_MODEL
         if self.pretrained:
             load_pretrained(
@@ -582,12 +560,8 @@ class TimeSformer(nn.Module):
         if remove_classifier:
             self.model.remove_classifier()
 
-        self.model.default_cfg = default_cfgs[
-            "vit_base_patch" + str(self.patch_size) + "_224"
-        ]
-        self.num_patches = (self.img_size // self.patch_size) * (
-            self.img_size // self.patch_size
-        )
+        self.model.default_cfg = default_cfgs["vit_base_patch" + str(self.patch_size) + "_224"]
+        self.num_patches = (self.img_size // self.patch_size) * (self.img_size // self.patch_size)
 
     def forward(self, x):
         x = self.model(x)
@@ -612,9 +586,7 @@ class TimeSformer(nn.Module):
         return x
 
     def load_state_dict(self, pretrained_ckpt_path):
-        logging.info(
-            "Loading TimeSformer checkpoints from {}".format(pretrained_ckpt_path)
-        )
+        logging.info("Loading TimeSformer checkpoints from {}".format(pretrained_ckpt_path))
 
         if pretrained_ckpt_path == "vit_base_patch16_224":
             load_ckpt_func = load_pretrained_imagenet

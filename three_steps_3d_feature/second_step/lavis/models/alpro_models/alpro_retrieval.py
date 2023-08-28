@@ -82,9 +82,7 @@ class AlproRetrieval(AlproBase):
 
         text_output = self.text_encoder.forward_text(
             text,
-            token_type_ids=torch.zeros(
-                text.input_ids.shape, dtype=torch.long, device=self.device
-            ),
+            token_type_ids=torch.zeros(text.input_ids.shape, dtype=torch.long, device=self.device),
         )
         text_embeds = text_output.last_hidden_state
         text_feat = F.normalize(self.text_proj(text_embeds[:, 0, :]), dim=-1)
@@ -93,9 +91,7 @@ class AlproRetrieval(AlproBase):
         # timeSformer asks for (b, c, t, h, w) as input.
         video_embeds = self.visual_encoder.forward_features(visual_inputs)
         video_feat = F.normalize(self.vision_proj(video_embeds[:, 0, :]), dim=-1)
-        video_atts = torch.ones(video_embeds.size()[:-1], dtype=torch.long).to(
-            self.device
-        )
+        video_atts = torch.ones(video_embeds.size()[:-1], dtype=torch.long).to(self.device)
 
         # ========== (in-batch) ITC loss ==========
         gathered_video_feats = all_gather_with_grad(video_feat)
@@ -147,9 +143,7 @@ class AlproRetrieval(AlproBase):
             ),
         )
 
-    def compute_vtm(
-        self, text_embeds, text_atts, image_embeds, image_atts, sim_i2t, sim_t2i
-    ):
+    def compute_vtm(self, text_embeds, text_atts, image_embeds, image_atts, sim_i2t, sim_t2i):
         device = self.device
 
         # ====== positive pairs =======
@@ -266,14 +260,10 @@ class AlproRetrieval(AlproBase):
             ).to(self.device)
             text_output = self.text_encoder.forward_text(
                 text_input,
-                token_type_ids=torch.zeros(
-                    text_input.input_ids.shape, dtype=torch.long, device=self.device
-                ),
+                token_type_ids=torch.zeros(text_input.input_ids.shape, dtype=torch.long, device=self.device),
             )
             text_feats.append(text_output.last_hidden_state.cpu())
-            text_embed = F.normalize(
-                self.text_proj(text_output.last_hidden_state[:, 0, :])
-            )
+            text_embed = F.normalize(self.text_proj(text_output.last_hidden_state[:, 0, :]))
             text_embeds.append(text_embed)
             text_ids.append(text_input.input_ids)
             text_atts.append(text_input.attention_mask)
@@ -300,9 +290,7 @@ class AlproRetrieval(AlproBase):
         video_embeds = torch.cat(video_embeds, dim=0)
 
         sims_matrix = video_embeds @ text_embeds.t()
-        score_matrix_v2t = torch.full(
-            (len(data_loader.dataset.image), len(texts)), -100.0
-        ).to(self.device)
+        score_matrix_v2t = torch.full((len(data_loader.dataset.image), len(texts)), -100.0).to(self.device)
 
         num_tasks = dist_utils.get_world_size()
         rank = dist_utils.get_rank()
@@ -311,22 +299,14 @@ class AlproRetrieval(AlproBase):
         end = min(sims_matrix.size(0), start + step)
 
         # video-to-text
-        for i, sims in enumerate(
-            metric_logger.log_every(sims_matrix[start:end], 50, header)
-        ):
+        for i, sims in enumerate(metric_logger.log_every(sims_matrix[start:end], 50, header)):
             topk_sim, topk_idx = sims.topk(k=k_test, dim=0)
 
-            video_feats_repeat = (
-                video_feats[start + i].repeat(k_test, 1, 1).to(self.device)
-            )
-            video_atts_repeat = torch.ones(
-                video_feats_repeat.size()[:-1], dtype=torch.long
-            ).to(self.device)
+            video_feats_repeat = video_feats[start + i].repeat(k_test, 1, 1).to(self.device)
+            video_atts_repeat = torch.ones(video_feats_repeat.size()[:-1], dtype=torch.long).to(self.device)
 
             attention_mask = torch.cat([text_atts[topk_idx], video_atts_repeat], dim=1)
-            embedding_output = torch.cat(
-                [text_feats[topk_idx].to(self.device), video_feats_repeat], dim=1
-            )
+            embedding_output = torch.cat([text_feats[topk_idx].to(self.device), video_feats_repeat], dim=1)
 
             output = self.text_encoder(
                 encoder_embeds=embedding_output,
@@ -340,32 +320,21 @@ class AlproRetrieval(AlproBase):
 
         # text-to-video
         sims_matrix = sims_matrix.t()
-        score_matrix_t2v = torch.full(
-            (len(texts), len(data_loader.dataset.image)), -100.0
-        ).to(self.device)
+        score_matrix_t2v = torch.full((len(texts), len(data_loader.dataset.image)), -100.0).to(self.device)
 
         step = sims_matrix.size(0) // num_tasks + 1
         start = rank * step
         end = min(sims_matrix.size(0), start + step)
 
-        for i, sims in enumerate(
-            metric_logger.log_every(sims_matrix[start:end], 50, header)
-        ):
-
+        for i, sims in enumerate(metric_logger.log_every(sims_matrix[start:end], 50, header)):
             topk_sim, topk_idx = sims.topk(k=k_test, dim=0)
 
-            text_feats_repeat = (
-                text_feats[start + i].repeat(k_test, 1, 1).to(self.device)
-            )
+            text_feats_repeat = text_feats[start + i].repeat(k_test, 1, 1).to(self.device)
             text_atts_repeat = text_atts[start + i].repeat(k_test, 1).to(self.device)
 
-            video_atts = torch.ones(
-                video_feats[topk_idx].size()[:-1], dtype=torch.long
-            ).to(self.device)
+            video_atts = torch.ones(video_feats[topk_idx].size()[:-1], dtype=torch.long).to(self.device)
 
-            embedding_output = torch.cat(
-                [text_feats_repeat, video_feats[topk_idx].to(self.device)], dim=1
-            )
+            embedding_output = torch.cat([text_feats_repeat, video_feats[topk_idx].to(self.device)], dim=1)
             attention_mask = torch.cat([text_atts_repeat, video_atts], dim=1)
 
             output = self.text_encoder(
@@ -380,12 +349,8 @@ class AlproRetrieval(AlproBase):
 
         if dist_utils.is_dist_avail_and_initialized():
             dist.barrier()
-            torch.distributed.all_reduce(
-                score_matrix_v2t, op=torch.distributed.ReduceOp.SUM
-            )
-            torch.distributed.all_reduce(
-                score_matrix_t2v, op=torch.distributed.ReduceOp.SUM
-            )
+            torch.distributed.all_reduce(score_matrix_v2t, op=torch.distributed.ReduceOp.SUM)
+            torch.distributed.all_reduce(score_matrix_t2v, op=torch.distributed.ReduceOp.SUM)
 
         total_time = time.time() - start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
@@ -410,13 +375,9 @@ class AlproRetrieval(AlproBase):
             max_txt_len=max_txt_len,
         )
 
-        num_patches = (
-            visual_encoder_config["image_size"] // visual_encoder_config["patch_size"]
-        ) ** 2
+        num_patches = (visual_encoder_config["image_size"] // visual_encoder_config["patch_size"]) ** 2
         num_frames = visual_encoder_config["n_frms"]
 
-        model.load_checkpoint_from_config(
-            cfg, num_frames=num_frames, num_patches=num_patches
-        )
+        model.load_checkpoint_from_config(cfg, num_frames=num_frames, num_patches=num_patches)
 
         return model

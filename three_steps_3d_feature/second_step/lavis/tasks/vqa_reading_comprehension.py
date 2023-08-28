@@ -33,7 +33,7 @@ class VQARCTask(VQATask):
     ):
         super().__init__(num_beams, max_len, min_len, evaluate, num_ans_candidates, inference_method)
 
-        self.config = kwargs.get('config')
+        self.config = kwargs.get("config")
 
     @classmethod
     def setup_task(cls, cfg):
@@ -65,16 +65,16 @@ class VQARCTask(VQATask):
             num_beams=self.num_beams,
             max_len=self.max_len,
             min_len=self.min_len,
-            internal_bsz_fid=self.config['internal_bsz_fid'],
-            num_captions=self.config['num_captions'],
-            num_captions_fid=self.config['num_captions_fid'],
-            cap_max_length=self.config['cap_max_length'],
-            cap_min_length=self.config['cap_min_length'],
-            top_k=self.config['top_k'],
-            top_p=self.config['top_p'],
-            repetition_penalty=self.config['repetition_penalty'],
-            num_patches=self.config['num_patches'],
-            block_num=self.config['block_num'],
+            internal_bsz_fid=self.config["internal_bsz_fid"],
+            num_captions=self.config["num_captions"],
+            num_captions_fid=self.config["num_captions_fid"],
+            cap_max_length=self.config["cap_max_length"],
+            cap_min_length=self.config["cap_min_length"],
+            top_k=self.config["top_k"],
+            top_p=self.config["top_p"],
+            repetition_penalty=self.config["repetition_penalty"],
+            num_patches=self.config["num_patches"],
+            block_num=self.config["block_num"],
         )
 
         pred_qa_pairs = []
@@ -120,9 +120,9 @@ class VQARCTask(VQATask):
         return metrics
 
     def save_gradcam(self, result, result_dir, filename, remove_duplicate=""):
-        result_file = os.path.join(result_dir, '%s_rank%d.pth' % (filename, get_rank()))
-        final_result_file = os.path.join(result_dir, '%s.pth' % filename)
-        torch.save({'result': result}, result_file)
+        result_file = os.path.join(result_dir, "%s_rank%d.pth" % (filename, get_rank()))
+        final_result_file = os.path.join(result_dir, "%s.pth" % filename)
+        torch.save({"result": result}, result_file)
 
         dist.barrier()
 
@@ -132,9 +132,9 @@ class VQARCTask(VQATask):
             result = []
 
             for rank in range(get_world_size()):
-                result_file = os.path.join(result_dir, '%s_rank%d.pth' % (filename, rank))
-                res_ckpt = torch.load(result_file, map_location='cpu')
-                res = res_ckpt['result']
+                result_file = os.path.join(result_dir, "%s_rank%d.pth" % (filename, rank))
+                res_ckpt = torch.load(result_file, map_location="cpu")
+                res = res_ckpt["result"]
 
                 result += res
 
@@ -147,7 +147,7 @@ class VQARCTask(VQATask):
                         result_new.append(res)
                 result = result_new
 
-            torch.save({'result': result}, final_result_file)
+            torch.save({"result": result}, final_result_file)
             print("result file saved to %s" % final_result_file)
 
         return final_result_file
@@ -162,16 +162,16 @@ class GQARCTask(VQARCTask):
             num_beams=self.num_beams,
             max_len=self.max_len,
             min_len=self.min_len,
-            internal_bsz_fid=self.config['internal_bsz_fid'],
-            num_captions=self.config['num_captions'],
-            num_captions_fid=self.config['num_captions_fid'],
-            cap_max_length=self.config['cap_max_length'],
-            cap_min_length=self.config['cap_min_length'],
-            top_k=self.config['top_k'],
-            top_p=self.config['top_p'],
-            repetition_penalty=self.config['repetition_penalty'],
-            num_patches=self.config['num_patches'],
-            block_num=self.config['block_num'],
+            internal_bsz_fid=self.config["internal_bsz_fid"],
+            num_captions=self.config["num_captions"],
+            num_captions_fid=self.config["num_captions_fid"],
+            cap_max_length=self.config["cap_max_length"],
+            cap_min_length=self.config["cap_min_length"],
+            top_k=self.config["top_k"],
+            top_p=self.config["top_p"],
+            repetition_penalty=self.config["repetition_penalty"],
+            num_patches=self.config["num_patches"],
+            block_num=self.config["block_num"],
         )
 
         pred_qa_pairs = []
@@ -181,7 +181,9 @@ class GQARCTask(VQARCTask):
         question_id = samples["question_id"]
         gt_answers = samples["answer"]
 
-        for pred_answer, caption, gradcam, ques_id, gt_answer in zip(answers, captions, gradcams, question_id, gt_answers):
+        for pred_answer, caption, gradcam, ques_id, gt_answer in zip(
+            answers, captions, gradcams, question_id, gt_answers
+        ):
             ques_id = int(ques_id.item())
             pred_qa_pairs.append({"question_id": ques_id, "pred_ans": pred_answer, "gt_ans": gt_answer})
             sample_captions.append({"question_id": ques_id, "caption": caption})
@@ -219,9 +221,7 @@ class GQARCTask(VQARCTask):
         accuracy = sum(acc) / len(acc) * 100
         metrics = {"agg_metrics": accuracy, "acc": accuracy}
 
-        with open(
-            os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a"
-        ) as f:
+        with open(os.path.join(registry.get_path("output_dir"), "evaluate.txt"), "a") as f:
             f.write(json.dumps(metrics) + "\n")
 
         logging.info(metrics)
@@ -235,10 +235,12 @@ class GQARCTask(VQARCTask):
         """
         result_leaderboard = []
         for res in results:
-            result_leaderboard.append({
-                "questionId": str(res['question_id']),
-                "prediction": str(res["pred_ans"]),
-            })
+            result_leaderboard.append(
+                {
+                    "questionId": str(res["question_id"]),
+                    "prediction": str(res["pred_ans"]),
+                }
+            )
 
         result_file = registry.get_path("result_dir") + "_leaderboard.json"
 

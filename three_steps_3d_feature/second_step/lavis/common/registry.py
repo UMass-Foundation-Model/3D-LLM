@@ -36,14 +36,10 @@ class Registry:
 
             assert issubclass(
                 builder_cls, BaseDatasetBuilder
-            ), "All builders must inherit BaseDatasetBuilder class, found {}".format(
-                builder_cls
-            )
+            ), "All builders must inherit BaseDatasetBuilder class, found {}".format(builder_cls)
             if name in cls.mapping["builder_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["builder_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["builder_name_mapping"][name])
                 )
             cls.mapping["builder_name_mapping"][name] = builder_cls
             return builder_cls
@@ -65,14 +61,10 @@ class Registry:
         def wrap(task_cls):
             from lavis.tasks.base_task import BaseTask
 
-            assert issubclass(
-                task_cls, BaseTask
-            ), "All tasks must inherit BaseTask class"
+            assert issubclass(task_cls, BaseTask), "All tasks must inherit BaseTask class"
             if name in cls.mapping["task_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["task_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["task_name_mapping"][name])
                 )
             cls.mapping["task_name_mapping"][name] = task_cls
             return task_cls
@@ -94,14 +86,10 @@ class Registry:
         def wrap(model_cls):
             from lavis.models import BaseModel
 
-            assert issubclass(
-                model_cls, BaseModel
-            ), "All models must inherit BaseModel class"
+            assert issubclass(model_cls, BaseModel), "All models must inherit BaseModel class"
             if name in cls.mapping["model_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["model_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["model_name_mapping"][name])
                 )
             cls.mapping["model_name_mapping"][name] = model_cls
             return model_cls
@@ -123,14 +111,10 @@ class Registry:
         def wrap(processor_cls):
             from lavis.processors import BaseProcessor
 
-            assert issubclass(
-                processor_cls, BaseProcessor
-            ), "All processors must inherit BaseProcessor class"
+            assert issubclass(processor_cls, BaseProcessor), "All processors must inherit BaseProcessor class"
             if name in cls.mapping["processor_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["processor_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["processor_name_mapping"][name])
                 )
             cls.mapping["processor_name_mapping"][name] = processor_cls
             return processor_cls
@@ -152,9 +136,7 @@ class Registry:
         def wrap(lr_sched_cls):
             if name in cls.mapping["lr_scheduler_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["lr_scheduler_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["lr_scheduler_name_mapping"][name])
                 )
             cls.mapping["lr_scheduler_name_mapping"][name] = lr_sched_cls
             return lr_sched_cls
@@ -176,9 +158,7 @@ class Registry:
         def wrap(runner_cls):
             if name in cls.mapping["runner_name_mapping"]:
                 raise KeyError(
-                    "Name '{}' already registered for {}.".format(
-                        name, cls.mapping["runner_name_mapping"][name]
-                    )
+                    "Name '{}' already registered for {}.".format(name, cls.mapping["runner_name_mapping"][name])
                 )
             cls.mapping["runner_name_mapping"][name] = runner_cls
             return runner_cls
@@ -300,14 +280,9 @@ class Registry:
             if value is default:
                 break
 
-        if (
-            "writer" in cls.mapping["state"]
-            and value == default
-            and no_warning is False
-        ):
+        if "writer" in cls.mapping["state"] and value == default and no_warning is False:
             cls.mapping["state"]["writer"].warning(
-                "Key {} is not present in registry, returning default value "
-                "of {}".format(original_name, default)
+                "Key {} is not present in registry, returning default value " "of {}".format(original_name, default)
             )
         return value
 

@@ -46,12 +46,8 @@ class RunnerIter(RunnerBase):
         self.max_iters = int(self.config.run_cfg.get("max_iters", -1))
         assert self.max_iters > 0, "max_iters must be greater than 0."
 
-        self.iters_per_inner_epoch = int(
-            self.config.run_cfg.get("iters_per_inner_epoch", -1)
-        )
-        assert (
-            self.iters_per_inner_epoch > 0
-        ), "iters_per_inner_epoch must be greater than 0."
+        self.iters_per_inner_epoch = int(self.config.run_cfg.get("iters_per_inner_epoch", -1))
+        assert self.iters_per_inner_epoch > 0, "iters_per_inner_epoch must be greater than 0."
 
     @property
     def max_epoch(self):
@@ -79,9 +75,7 @@ class RunnerIter(RunnerBase):
         if not self.evaluate_only and self.resume_ckpt_path is not None:
             self._load_checkpoint(self.resume_ckpt_path)
 
-        for start_iters in range(
-            self.start_iters, self.max_iters, self.iters_per_inner_epoch
-        ):
+        for start_iters in range(self.start_iters, self.max_iters, self.iters_per_inner_epoch):
             end_iters = start_iters + self.iters_per_inner_epoch
 
             # training phase
@@ -100,14 +94,10 @@ class RunnerIter(RunnerBase):
                 for split_name in self.valid_splits:
                     logging.info("Evaluating on {}.".format(split_name))
 
-                    val_log = self.eval_epoch(
-                        split_name=split_name, cur_epoch=self._progress(end_iters)
-                    )
+                    val_log = self.eval_epoch(split_name=split_name, cur_epoch=self._progress(end_iters))
                     if val_log is not None:
                         if is_main_process():
-                            assert (
-                                "agg_metrics" in val_log
-                            ), "No agg_metrics found in validation log."
+                            assert "agg_metrics" in val_log, "No agg_metrics found in validation log."
 
                             agg_metrics = val_log["agg_metrics"]
                             if agg_metrics > best_agg_metric and split_name == "val":
@@ -173,9 +163,7 @@ class RunnerIter(RunnerBase):
         Resume from a checkpoint.
         """
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location=self.device)
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location=self.device)
@@ -229,38 +217,26 @@ class RunnerIter(RunnerBase):
                 # create multi-loader with the provided ratios, without concatenating or chaining
                 missing_keys = [k for k in dataset_ratios if k not in self.datasets]
                 if len(missing_keys) > 0:
-                    raise ValueError(
-                        "Datasets with the following split names are not found: {}".format(
-                            missing_keys
-                        )
-                    )
+                    raise ValueError("Datasets with the following split names are not found: {}".format(missing_keys))
 
                 unexpected_keys = [k for k in self.datasets if k not in dataset_ratios]
                 if len(unexpected_keys) > 0:
                     raise ValueError(
-                        "Datasets with the following split names are not expected: {}".format(
-                            unexpected_keys
-                        )
+                        "Datasets with the following split names are not expected: {}".format(unexpected_keys)
                     )
 
                 dataset_ratios = [float(dataset_ratios[k]) for k in self.datasets]
                 self.datasets = reorg_datasets_by_split(self.datasets)
                 # to keep the same structure as return value of concat_datasets
-                self.datasets = {
-                    k: v[0] if len(v) == 1 else v for k, v in datasets.items()
-                }
+                self.datasets = {k: v[0] if len(v) == 1 else v for k, v in datasets.items()}
 
             # print dataset statistics after concatenation/chaining
             for split_name in self.datasets:
-                if isinstance(self.datasets[split_name], tuple) or isinstance(
-                    self.datasets[split_name], list
-                ):
+                if isinstance(self.datasets[split_name], tuple) or isinstance(self.datasets[split_name], list):
                     # mixed wds.DataPipeline and torch.utils.data.Dataset
                     num_records = sum(
                         [
-                            len(d)
-                            if not type(d) in [wds.DataPipeline, ChainDataset]
-                            else 0
+                            len(d) if not type(d) in [wds.DataPipeline, ChainDataset] else 0
                             for d in self.datasets[split_name]
                         ]
                     )
@@ -272,16 +248,10 @@ class RunnerIter(RunnerBase):
                     except TypeError:
                         # a single wds.DataPipeline or ChainDataset
                         num_records = -1
-                        logging.info(
-                            "Only a single wds.DataPipeline dataset, no __len__ attribute."
-                        )
+                        logging.info("Only a single wds.DataPipeline dataset, no __len__ attribute.")
 
                 if num_records >= 0:
-                    logging.info(
-                        "Loaded {} records for {} split from the dataset.".format(
-                            num_records, split_name
-                        )
-                    )
+                    logging.info("Loaded {} records for {} split from the dataset.".format(num_records, split_name))
 
             # create dataloaders
             split_names = sorted(self.datasets.keys())
@@ -290,9 +260,7 @@ class RunnerIter(RunnerBase):
             is_trains = [split in self.train_splits for split in split_names]
 
             batch_sizes = [
-                self.config.run_cfg.batch_size_train
-                if split == "train"
-                else self.config.run_cfg.batch_size_eval
+                self.config.run_cfg.batch_size_train if split == "train" else self.config.run_cfg.batch_size_eval
                 for split in split_names
             ]
 

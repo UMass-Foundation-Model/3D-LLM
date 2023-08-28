@@ -74,10 +74,11 @@ $ python chatcaption.py --specific_scene f6e9ec5953854dff94176c36b877c519
 ```
 
 #### Step3: 3D feature construction from rendered images
-TODO
 
-
-
+Follow the instruction in ``3DLanguage_data/ChatCaptioner_based/gen_features/README.md`` for extracting 3D features from rendered images.
+```shell
+$ cd ./3DLanguage_data/ChatCaptioner_based/gen_features
+```
 
 
 ### Box-Demonstration-Instruction based

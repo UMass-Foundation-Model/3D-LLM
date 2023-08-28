@@ -165,12 +165,8 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
         return encoder_output, encoder_output_m, image_embeds, image_embeds_m
 
     def forward_decoder(self, samples, encoder_out, **kwargs):
-        answers = self.tokenizer(
-            samples["answer"], padding="longest", return_tensors="pt"
-        ).to(self.device)
-        answer_targets = answers.input_ids.masked_fill(
-            answers.input_ids == self.tokenizer.pad_token_id, -100
-        )
+        answers = self.tokenizer(samples["answer"], padding="longest", return_tensors="pt").to(self.device)
+        answer_targets = answers.input_ids.masked_fill(answers.input_ids == self.tokenizer.pad_token_id, -100)
 
         question_states = []
         question_atts = []
@@ -262,9 +258,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
 
         num_ans_candidates = min(num_ans_candidates, len(answer_list))
 
-        return self.rank_answers(
-            samples, answer_list=answer_list, num_ans_candidates=num_ans_candidates
-        )
+        return self.rank_answers(samples, answer_list=answer_list, num_ans_candidates=num_ans_candidates)
 
     def rank_answers(self, samples, answer_list, num_ans_candidates):
         """
@@ -274,9 +268,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
         Return the answers that minimize the losses as result.
 
         """
-        answer_candidates = self.tokenizer(
-            answer_list, padding="longest", return_tensors="pt"
-        ).to(self.device)
+        answer_candidates = self.tokenizer(answer_list, padding="longest", return_tensors="pt").to(self.device)
         # answer_candidates.input_ids[:, 0] = self.tokenizer.bos_token_id
 
         answer_ids = answer_candidates.input_ids
@@ -303,9 +295,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
         # topk_probs: top-k probability
         # topk_ids: [num_question, k]
         answer_first_token = answer_ids[:, 1]
-        prob_first_token = F.softmax(logits, dim=1).index_select(
-            dim=1, index=answer_first_token
-        )
+        prob_first_token = F.softmax(logits, dim=1).index_select(dim=1, index=answer_first_token)
         topk_probs, topk_ids = prob_first_token.topk(num_ans_candidates, dim=1)
 
         # answer input: [num_question*k, answer_len]
@@ -317,9 +307,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
         input_ids = torch.cat(input_ids, dim=0)
         input_atts = torch.cat(input_atts, dim=0)
 
-        targets_ids = input_ids.masked_fill(
-            input_ids == self.tokenizer.pad_token_id, -100
-        )
+        targets_ids = input_ids.masked_fill(input_ids == self.tokenizer.pad_token_id, -100)
 
         # repeat encoder's output for top-k answers
         question_states = tile(question_states, 0, num_ans_candidates)
@@ -354,9 +342,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
         config_decoder = BertConfig.from_json_file(get_abs_path(cfg["med_config_path"]))
         config_decoder.fusion_layer = 0
         config_decoder.num_hidden_layers = 6
-        text_decoder = BertLMHeadModel.from_pretrained(
-            "bert-base-uncased", config=config_decoder
-        )
+        text_decoder = BertLMHeadModel.from_pretrained("bert-base-uncased", config=config_decoder)
 
         alpha = cfg.get("alpha", 0.4)
         momentum = cfg.get("momentum", 0.995)
@@ -380,9 +366,7 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
 
     def load_from_pretrained(self, url_or_filename):
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location="cpu")
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location="cpu")
@@ -395,14 +379,10 @@ class AlbefVQA(AlbefBase, MomentumDistilationMixin):
             state_dict = checkpoint
 
         # reshape positional embedding to accomodate for image resolution change
-        pos_embed_reshaped = interpolate_pos_embed(
-            state_dict["visual_encoder.pos_embed"], self.visual_encoder
-        )
+        pos_embed_reshaped = interpolate_pos_embed(state_dict["visual_encoder.pos_embed"], self.visual_encoder)
         state_dict["visual_encoder.pos_embed"] = pos_embed_reshaped
 
-        m_pos_embed_reshaped = interpolate_pos_embed(
-            state_dict["visual_encoder_m.pos_embed"], self.visual_encoder_m
-        )
+        m_pos_embed_reshaped = interpolate_pos_embed(state_dict["visual_encoder_m.pos_embed"], self.visual_encoder_m)
         state_dict["visual_encoder_m.pos_embed"] = m_pos_embed_reshaped
 
         for key in list(state_dict.keys()):

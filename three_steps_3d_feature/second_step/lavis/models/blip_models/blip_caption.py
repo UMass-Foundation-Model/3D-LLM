@@ -67,15 +67,11 @@ class BlipCaption(BlipBase):
         text.input_ids[:, 0] = self.tokenizer.bos_token_id
 
         # prepare targets for forwarding decoder
-        decoder_targets = text.input_ids.masked_fill(
-            text.input_ids == self.tokenizer.pad_token_id, -100
-        )
+        decoder_targets = text.input_ids.masked_fill(text.input_ids == self.tokenizer.pad_token_id, -100)
         decoder_targets[:, : self.prompt_length] = -100
 
         # forward decoder
-        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(
-            self.device
-        )
+        image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(self.device)
         decoder_output = self.text_decoder(
             input_ids=text.input_ids,
             attention_mask=text.attention_mask,

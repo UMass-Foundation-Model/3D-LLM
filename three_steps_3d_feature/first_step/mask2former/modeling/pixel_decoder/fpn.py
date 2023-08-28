@@ -15,7 +15,12 @@ from detectron2.layers import Conv2d, DeformConv, ShapeSpec, get_norm
 from detectron2.modeling import SEM_SEG_HEADS_REGISTRY
 
 from ..transformer_decoder.position_encoding import PositionEmbeddingSine
-from ..transformer_decoder.transformer import TransformerEncoder, TransformerEncoderLayer, _get_clones, _get_activation_fn
+from ..transformer_decoder.transformer import (
+    TransformerEncoder,
+    TransformerEncoderLayer,
+    _get_clones,
+    _get_activation_fn,
+)
 
 
 def build_pixel_decoder(cfg, input_shape):
@@ -85,9 +90,7 @@ class BasePixelDecoder(nn.Module):
                 lateral_norm = get_norm(norm, conv_dim)
                 output_norm = get_norm(norm, conv_dim)
 
-                lateral_conv = Conv2d(
-                    in_channels, conv_dim, kernel_size=1, bias=use_bias, norm=lateral_norm
-                )
+                lateral_conv = Conv2d(in_channels, conv_dim, kernel_size=1, bias=use_bias, norm=lateral_norm)
                 output_conv = Conv2d(
                     conv_dim,
                     conv_dim,
@@ -125,9 +128,7 @@ class BasePixelDecoder(nn.Module):
     @classmethod
     def from_config(cls, cfg, input_shape: Dict[str, ShapeSpec]):
         ret = {}
-        ret["input_shape"] = {
-            k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES
-        }
+        ret["input_shape"] = {k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES}
         ret["conv_dim"] = cfg.MODEL.SEM_SEG_HEAD.CONVS_DIM
         ret["mask_dim"] = cfg.MODEL.SEM_SEG_HEAD.MASK_DIM
         ret["norm"] = cfg.MODEL.SEM_SEG_HEAD.NORM
@@ -172,9 +173,7 @@ class TransformerEncoderOnly(nn.Module):
     ):
         super().__init__()
 
-        encoder_layer = TransformerEncoderLayer(
-            d_model, nhead, dim_feedforward, dropout, activation, normalize_before
-        )
+        encoder_layer = TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout, activation, normalize_before)
         encoder_norm = nn.LayerNorm(d_model) if normalize_before else None
         self.encoder = TransformerEncoder(encoder_layer, num_encoder_layers, encoder_norm)
 
@@ -275,9 +274,7 @@ class TransformerEncoderPixelDecoder(BasePixelDecoder):
         ret["transformer_dropout"] = cfg.MODEL.MASK_FORMER.DROPOUT
         ret["transformer_nheads"] = cfg.MODEL.MASK_FORMER.NHEADS
         ret["transformer_dim_feedforward"] = cfg.MODEL.MASK_FORMER.DIM_FEEDFORWARD
-        ret[
-            "transformer_enc_layers"
-        ] = cfg.MODEL.SEM_SEG_HEAD.TRANSFORMER_ENC_LAYERS  # a separate config
+        ret["transformer_enc_layers"] = cfg.MODEL.SEM_SEG_HEAD.TRANSFORMER_ENC_LAYERS  # a separate config
         ret["transformer_pre_norm"] = cfg.MODEL.MASK_FORMER.PRE_NORM
         return ret
 

@@ -88,9 +88,7 @@ class RunnerBase:
             # distributed training wrapper
             if self.use_distributed:
                 if self._wrapped_model is None:
-                    self._wrapped_model = DDP(
-                        self._model, device_ids=[self.config.run_cfg.gpu]
-                    )
+                    self._wrapped_model = DDP(self._model, device_ids=[self.config.run_cfg.gpu])
             else:
                 self._wrapped_model = self._model
 
@@ -185,15 +183,11 @@ class RunnerBase:
 
             # print dataset statistics after concatenation/chaining
             for split_name in self.datasets:
-                if isinstance(self.datasets[split_name], tuple) or isinstance(
-                    self.datasets[split_name], list
-                ):
+                if isinstance(self.datasets[split_name], tuple) or isinstance(self.datasets[split_name], list):
                     # mixed wds.DataPipeline and torch.utils.data.Dataset
                     num_records = sum(
                         [
-                            len(d)
-                            if not type(d) in [wds.DataPipeline, ChainDataset]
-                            else 0
+                            len(d) if not type(d) in [wds.DataPipeline, ChainDataset] else 0
                             for d in self.datasets[split_name]
                         ]
                     )
@@ -205,16 +199,10 @@ class RunnerBase:
                     else:
                         # a single wds.DataPipeline
                         num_records = -1
-                        logging.info(
-                            "Only a single wds.DataPipeline dataset, no __len__ attribute."
-                        )
+                        logging.info("Only a single wds.DataPipeline dataset, no __len__ attribute.")
 
                 if num_records >= 0:
-                    logging.info(
-                        "Loaded {} records for {} split from the dataset.".format(
-                            num_records, split_name
-                        )
-                    )
+                    logging.info("Loaded {} records for {} split from the dataset.".format(num_records, split_name))
 
             # create dataloaders
             split_names = sorted(self.datasets.keys())
@@ -223,9 +211,7 @@ class RunnerBase:
             is_trains = [split in self.train_splits for split in split_names]
 
             batch_sizes = [
-                self.config.run_cfg.batch_size_train
-                if split == "train"
-                else self.config.run_cfg.batch_size_eval
+                self.config.run_cfg.batch_size_train if split == "train" else self.config.run_cfg.batch_size_eval
                 for split in split_names
             ]
 
@@ -357,14 +343,10 @@ class RunnerBase:
                 for split_name in self.valid_splits:
                     logging.info("Evaluating on {}.".format(split_name))
 
-                    val_log = self.eval_epoch(
-                        split_name=split_name, cur_epoch=cur_epoch
-                    )
+                    val_log = self.eval_epoch(split_name=split_name, cur_epoch=cur_epoch)
                     if val_log is not None:
                         if is_main_process():
-                            assert (
-                                "agg_metrics" in val_log
-                            ), "No agg_metrics found in validation log."
+                            assert "agg_metrics" in val_log, "No agg_metrics found in validation log."
 
                             agg_metrics = val_log["agg_metrics"]
                             if agg_metrics > best_agg_metric and split_name == "val":
@@ -476,9 +458,7 @@ class RunnerBase:
 
         def _create_loader(dataset, num_workers, bsz, is_train, collate_fn):
             # create a single dataloader for each split
-            if isinstance(dataset, ChainDataset) or isinstance(
-                dataset, wds.DataPipeline
-            ):
+            if isinstance(dataset, ChainDataset) or isinstance(dataset, wds.DataPipeline):
                 # wds.WebdDataset instance are chained together
                 # webdataset.DataPipeline has its own sampler and collate_fn
                 loader = iter(
@@ -524,14 +504,11 @@ class RunnerBase:
 
         loaders = []
 
-        for dataset, bsz, is_train, collate_fn in zip(
-            datasets, batch_sizes, is_trains, collate_fns
-        ):
+        for dataset, bsz, is_train, collate_fn in zip(datasets, batch_sizes, is_trains, collate_fns):
             if isinstance(dataset, list) or isinstance(dataset, tuple):
                 loader = MultiIterLoader(
                     loaders=[
-                        _create_loader(d, num_workers, bsz, is_train, collate_fn[i])
-                        for i, d in enumerate(dataset)
+                        _create_loader(d, num_workers, bsz, is_train, collate_fn[i]) for i, d in enumerate(dataset)
                     ],
                     ratios=dataset_ratios,
                 )
@@ -577,9 +554,7 @@ class RunnerBase:
         Resume from a checkpoint.
         """
         if is_url(url_or_filename):
-            cached_file = download_cached_file(
-                url_or_filename, check_hash=False, progress=True
-            )
+            cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
             checkpoint = torch.load(cached_file, map_location=self.device)
         elif os.path.isfile(url_or_filename):
             checkpoint = torch.load(url_or_filename, map_location=self.device)

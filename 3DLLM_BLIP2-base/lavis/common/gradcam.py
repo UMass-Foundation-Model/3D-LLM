@@ -18,7 +18,7 @@ def getAttMap(img, attMap, blur=True, overlap=True):
     attMapV = np.delete(attMapV, 3, 2)
     if overlap:
         attMap = (
-            1 * (1 - attMap ** 0.7).reshape(attMap.shape + (1,)) * img
-            + (attMap ** 0.7).reshape(attMap.shape + (1,)) * attMapV
+            1 * (1 - attMap**0.7).reshape(attMap.shape + (1,)) * img
+            + (attMap**0.7).reshape(attMap.shape + (1,)) * attMapV
         )
     return attMap

@@ -81,9 +81,7 @@ class InstanceSegEvaluator(COCOEvaluator):
             return
 
         self._logger.info(
-            "Evaluating predictions with {} COCO API...".format(
-                "unofficial" if self._use_fast_impl else "official"
-            )
+            "Evaluating predictions with {} COCO API...".format("unofficial" if self._use_fast_impl else "official")
         )
         for task in sorted(tasks):
             assert task in {"bbox", "segm", "keypoints"}, f"Got unknown task: {task}!"
@@ -101,7 +99,5 @@ class InstanceSegEvaluator(COCOEvaluator):
                 else None  # cocoapi does not handle empty results very well
             )
 
-            res = self._derive_coco_results(
-                coco_eval, task, class_names=self._metadata.get("thing_classes")
-            )
+            res = self._derive_coco_results(coco_eval, task, class_names=self._metadata.get("thing_classes"))
             self._results[task] = res

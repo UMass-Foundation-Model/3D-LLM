@@ -17,7 +17,6 @@ from ..pixel_decoder.fpn import build_pixel_decoder
 
 @SEM_SEG_HEADS_REGISTRY.register()
 class MaskFormerHead(nn.Module):
-
     _version = 2
 
     def _load_from_state_dict(
@@ -97,9 +96,7 @@ class MaskFormerHead(nn.Module):
             transformer_predictor_in_channels = input_shape[cfg.MODEL.MASK_FORMER.TRANSFORMER_IN_FEATURE].channels
 
         return {
-            "input_shape": {
-                k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES
-            },
+            "input_shape": {k: v for k, v in input_shape.items() if k in cfg.MODEL.SEM_SEG_HEAD.IN_FEATURES},
             "ignore_value": cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
             "num_classes": cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES,
             "pixel_decoder": build_pixel_decoder(cfg, input_shape),
@@ -116,14 +113,14 @@ class MaskFormerHead(nn.Module):
         return self.layers(features, mask)
 
     def layers(self, features, mask=None):
-        mask_features, transformer_encoder_features, multi_scale_features = self.pixel_decoder.forward_features(features)
+        mask_features, transformer_encoder_features, multi_scale_features = self.pixel_decoder.forward_features(
+            features
+        )
         if self.transformer_in_feature == "multi_scale_pixel_decoder":
             predictions = self.predictor(multi_scale_features, mask_features, mask)
         else:
             if self.transformer_in_feature == "transformer_encoder":
-                assert (
-                    transformer_encoder_features is not None
-                ), "Please use the TransformerEncoderPixelDecoder."
+                assert transformer_encoder_features is not None, "Please use the TransformerEncoderPixelDecoder."
                 predictions = self.predictor(transformer_encoder_features, mask_features, mask)
             elif self.transformer_in_feature == "pixel_embedding":
                 predictions = self.predictor(mask_features, mask_features, mask)

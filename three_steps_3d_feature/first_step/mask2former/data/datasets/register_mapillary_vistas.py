@@ -491,9 +491,7 @@ def register_all_mapillary_vistas(root):
         image_dir = os.path.join(root, dirname, "images")
         gt_dir = os.path.join(root, dirname, "labels")
         name = f"mapillary_vistas_sem_seg_{name}"
-        DatasetCatalog.register(
-            name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="png", image_ext="jpg")
-        )
+        DatasetCatalog.register(name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="png", image_ext="jpg"))
         MetadataCatalog.get(name).set(
             image_root=image_dir,
             sem_seg_root=gt_dir,

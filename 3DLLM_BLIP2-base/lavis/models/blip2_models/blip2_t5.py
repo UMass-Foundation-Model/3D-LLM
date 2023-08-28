@@ -106,6 +106,7 @@ class Blip2T5(Blip2Base):
                 all_pcs[j][:, :1407] = pcs
             all_pcs = all_pcs.cuda()
 
+        pc_embeds = torch.cat([pc_embeds, all_pcs], 1)
         image_atts = torch.ones(pc_embeds.size()[:-1], dtype=torch.long).to(pc_embeds.device)
 
         query_tokens = self.query_tokens.expand(pc_embeds.shape[0], -1, -1)  # 768
@@ -278,6 +279,8 @@ class Blip2T5(Blip2Base):
                 pcs = torch.cat(pcs, -1)
                 all_pcs[j][:, :1407] = pcs
             all_pcs = all_pcs.cuda()
+
+        pc_embeds = torch.cat([pc_embeds, all_pcs], 1)
         image_atts = torch.ones(pc_embeds.size()[:-1], dtype=torch.long).to(pc_embeds.device)
 
         query_tokens = self.query_tokens.expand(pc_embeds.shape[0], -1, -1)

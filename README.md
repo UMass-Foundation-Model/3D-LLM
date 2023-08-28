@@ -153,7 +153,7 @@ After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``
 ``N`` is the number of sampled points in the point cloud (default: 300000) and ``n_dim`` is the feature dimension (1024 for CLIP feature, 1408 for BLIP feature).
 
 #### GradSLAM (Feature Fusion)
-Also refer to [Concept Fusion](https://github.com/concept-fusion/concept-fusion).
+Refer to [Concept Fusion](https://github.com/concept-fusion/concept-fusion).
 
 We will also release our reproduced version of Concept Fusion for our feature generation (we reproduced the paper before their official release).
 

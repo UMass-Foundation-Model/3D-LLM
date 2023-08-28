@@ -85,6 +85,7 @@ TODO
 TODO
 
 ## Three-step 3D Feature Extraction
+This section is for constructing 3D features for scene data. If you already downloaded our released scene data, please skip this section.
 ### First step
 Installation: 
 
@@ -131,6 +132,7 @@ After the second step, we are expected to obtain a directory of features (specif
 multi-view images of the scenes.
 
 ### Third step
+#### Direct Reconstruction
 Installation:
 
 Please install the [Habitat environment](https://github.com/facebookresearch/habitat-lab/tree/challenge-2022).
@@ -146,6 +148,9 @@ $ python sam_mask.py --data_dir_path DATA_DIR_WITH_RGB_IMAGES --depth_dir_path D
 After the third step, we are expected to obtain two files (``pcd_pos.pt`` and ``pcd_feat.pt``) for each room inside the corresponding RGB directory.
 ``pcd_pos.pt`` contains the point positions of the 3D point cloud (shape: ``N * 3``). ``pcd_feat.pt`` contains the point features of the 3D point cloud (shape: ``N * n_dim``).
 ``N`` is the number of sampled points in the point cloud (default: 300000) and ``n_dim`` is the feature dimension (1024 for CLIP feature, 1408 for BLIP feature).
+
+#### GradSLAM
+TODO
 
 ## 3D-LLM_BLIP2-based
 ### Installation

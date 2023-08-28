@@ -37,6 +37,7 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
   &emsp;We will also release a small set of Objaverse 3D features
 #### Scene Data
  &emsp; [Language data released here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing)
+ 
  &emsp; 3D features and point clouds (~250G) will be released soon
 
 ### Finetuning Data

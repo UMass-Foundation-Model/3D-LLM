@@ -30,9 +30,6 @@ class Blip2Base(BaseModel):
     @classmethod
     def init_tokenizer(cls):
         tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-        location_tokens = []
-        for i in range(11 * 11 * 11):
-            location_tokens.append("<loc%d>" % i)
         tokenizer.add_special_tokens({"bos_token": "[DEC]", "additional_special_tokens": location_tokens})
         return tokenizer
 

@@ -26,7 +26,9 @@ Preliminary Code.
 
 ## Data
 All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing)
+
 ### Pretraining Data
+We are still cleaning the grounding part. All other pre-training data are released.
 #### Object Data
   &emsp;Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
 
@@ -36,7 +38,7 @@ All data will be gradually released in [Google Drive](https://drive.google.com/d
 
   &emsp;TODO: We will also release a small set (or probably the whole set) of Objaverse 3D features 
 #### Scene Data
- &emsp; [Language data released here](https://drive.google.com/file/d/1LcHDzMutr6JlDiixmYEnYJsm7TWsIyvG/view?usp=sharing)
+ &emsp; [Language data released here](https://drive.google.com/file/d/1LcHDzMutr6JlDiixmYEnYJsm7TWsIyvG/view?usp=sharing). 
  
  &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/file/d/118JSjS1nl-1v87wC2oTxEmQzSSyCIBXM/view?usp=sharing). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction)
 

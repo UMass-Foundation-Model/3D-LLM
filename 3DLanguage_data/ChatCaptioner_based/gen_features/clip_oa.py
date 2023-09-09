@@ -1,16 +1,20 @@
-import time
 import torch
 import torchvision
 import cv2
 import numpy as np
 from tqdm import tqdm
 import os
+import time
 from torch import nn
-from lavis.models.eva_vit import create_eva_vit_g
+
+# from lavis.models.eva_vit import create_eva_vit_g
 import argparse
+import clip
+import open_clip
 
 LOAD_IMG_HEIGHT = 240
 LOAD_IMG_WIDTH = 320
+from PIL import Image
 
 
 def get_new_pallete(num_colors: int) -> torch.Tensor:
@@ -71,20 +75,29 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    frame_path = "./data/objaverse_frame_cap3d"
-    mask_path = "./data/objaverse_masks_cap3d"
-    out_path = "./data/objaverse_2dfeat_cap3d"
-    voxel_feature_path = "./data/objaverse_feat_cap3d/"
-    out_folder = "nps_blip"
+    OPENCLIP_MODEL = "ViT-L-14"  # "ViT-bigG-14"
+    OPENCLIP_DATA = "laion2b_s32b_b82k"  # "laion2b_s39b_b160k"
+    print("Initializing model...")
+    model, _, preprocess = open_clip.create_model_and_transforms(OPENCLIP_MODEL, OPENCLIP_DATA)
+    model.visual.output_tokens = True
+    model.cuda()
+    model.eval()
+    tokenizer = open_clip.get_tokenizer(OPENCLIP_MODEL)
 
-    scene_list = os.listdir(frame_path)
+    frame_path = "./data/objaverse_frame"
+    mask_path = "./data/objaverse_masks"
 
-    N = len(scene_list)
+    out_path = "./data/objaverse_2dfeat"
+    voxel_feature_path = "./data/objaverse_feat/"
+    out_folder = "nps_1024_hiddAve_ViTL"
+
+    scene_lists = os.listdir(frame_path)
+
+    N = len(scene_lists)
     jobs = args.all_jobs
     ids = N // jobs + 1
-    visual_encoder = create_eva_vit_g(LOAD_IMG_HEIGHT).to(device).eval()
-
-    for scene in tqdm(scene_list[args.job * ids : min(N, args.job * ids + ids)]):
+    print(f"begin {args.job}")
+    for scene in tqdm(scene_lists[args.job * ids : min(N, args.job * ids + ids)]):
         if os.path.exists(os.path.join(voxel_feature_path, "features", f"{scene}_outside.pt")) and os.path.exists(
             os.path.join(voxel_feature_path, "points", f"{scene}_outside.npy")
         ):
@@ -96,48 +109,54 @@ if __name__ == "__main__":
         if not os.path.exists(scene_mask_path) or len(os.listdir(scene_mask_path)) < 8:
             continue
         try:
-            os.makedirs(os.path.join(out_path, scene, out_folder), exist_ok=True)
             img_list = [
                 img for img in os.listdir(os.path.join(frame_path, scene)) if img.endswith(".png") and "norm" not in img
             ]
             if len(os.listdir(os.path.join(out_path, scene, out_folder))) == len(img_list):
                 print("done")
                 continue
+        except:
+            pass
+        try:
+            os.mkdir(os.path.join(out_path, scene, out_folder))
+        except:
+            pass
 
-            for file in os.listdir(scene_mask_path):
-                INPUT_IMAGE_PATH = os.path.join(frame_path, scene, file.replace(".pt", ".png"))
-                SEMIGLOBAL_FEAT_SAVE_FILE = os.path.join(out_path, scene, out_folder, file)
-                if os.path.exists(SEMIGLOBAL_FEAT_SAVE_FILE):
+        for file in os.listdir(os.path.join(mask_path, scene)):
+            file = file.replace(".pt", ".png")
+            try:
+                INPUT_IMAGE_PATH = os.path.join(frame_path, scene, file)
+                SEMIGLOBAL_FEAT_SAVE_FILE = os.path.join(out_path, scene, out_folder, file.replace(".png", ".pt"))
+                if os.path.isfile(SEMIGLOBAL_FEAT_SAVE_FILE):
                     continue
 
                 raw_image = cv2.imread(INPUT_IMAGE_PATH)
                 raw_image = cv2.resize(raw_image, (LOAD_IMG_WIDTH, LOAD_IMG_HEIGHT))
-                image = (
-                    torch.tensor(raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT]).permute(2, 0, 1).unsqueeze(0).to(device)
-                )
+                image = torch.tensor(raw_image).to(device)
 
-                with torch.no_grad():
-                    output = visual_encoder(image)
+                """
+                Extract and save global feat vec
+                """
+                global_feat = None
+                with torch.cuda.amp.autocast():
+                    _img = preprocess(Image.open(INPUT_IMAGE_PATH)).unsqueeze(0)  # [1, 3, 224, 224]
+                    imgfeat = model.visual(_img.cuda())[1]  # All image token feat [1, 256, 1024]
+                    imgfeat = torch.mean(imgfeat, dim=1)
 
-                global_feat = output.clone().detach()
-                global_feat = global_feat.half().cuda()
-                global_feat = global_feat[:, :-1, :].resize(1, 17, 17, 1408).permute((0, 3, 1, 2))
-                m = nn.AdaptiveAvgPool2d((1, 1))
-                global_feat = m(global_feat)
-                global_feat = global_feat.squeeze(-1).squeeze(-1)
+                global_feat = imgfeat.half().cuda()
 
                 global_feat = torch.nn.functional.normalize(global_feat, dim=-1)  # --> (1, 1024)
                 FEAT_DIM = global_feat.shape[-1]
 
                 cosine_similarity = torch.nn.CosineSimilarity(dim=-1)
 
-                MASK_LOAD_FILE = os.path.join(mask_path, scene, file)
-                outfeat = torch.zeros(LOAD_IMG_HEIGHT, LOAD_IMG_HEIGHT, FEAT_DIM, dtype=torch.half)
+                MASK_LOAD_FILE = os.path.join(mask_path, scene, file.replace(".png", ".pt"))
+                outfeat = torch.zeros(LOAD_IMG_HEIGHT, LOAD_IMG_WIDTH, FEAT_DIM, dtype=torch.half)
 
-                # print(f"Loading instance masks {MASK_LOAD_FILE}...")
+                if not os.path.isfile(MASK_LOAD_FILE):
+                    print(MASK_LOAD_FILE, "not exist")
+                    continue
                 mask = torch.load(MASK_LOAD_FILE).unsqueeze(0)  # 1, num_masks, H, W
-                mask = mask[:, :, :LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT]
-
                 num_masks = mask.shape[-3]
                 pallete = get_new_pallete(num_masks)
 
@@ -155,33 +174,26 @@ if __name__ == "__main__":
                     bbox_area = (x1 - x0 + 1) * (y1 - y0 + 1)
                     img_area = LOAD_IMG_WIDTH * LOAD_IMG_HEIGHT
                     iou = bbox_area / img_area
-
                     if iou < 0.005:
                         continue
-                    roi = torch.ones((LOAD_IMG_HEIGHT, LOAD_IMG_HEIGHT, 3))
-                    img_roi = torch.tensor(raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT])[x0:x1, y0:y1]
-                    roi[x0:x1, y0:y1] = img_roi
-                    img_roi = roi.permute(2, 0, 1).unsqueeze(0).to(device)
-
                     with torch.no_grad():
-                        roifeat = visual_encoder(img_roi)
-                    roifeat = roifeat.clone().detach()
-                    roifeat = roifeat.half().cuda()
-                    roifeat = roifeat[:, :-1, :].resize(1, 17, 17, 1408).permute((0, 3, 1, 2))
-                    m = nn.AdaptiveAvgPool2d((1, 1))
-                    roifeat = m(roifeat)
-                    roifeat = roifeat.squeeze(-1).squeeze(-1)
+                        img_roi = image[x0:x1, y0:y1]
+                        img_roi = Image.fromarray(img_roi.detach().cpu().numpy())
+                        img_roi = preprocess(img_roi).unsqueeze(0).cuda()
+                        roifeat = model.visual(img_roi)[1]  # All image token feat [1, 256, 1024]
+                        roifeat = torch.mean(roifeat, dim=1)
 
-                    roifeat = torch.nn.functional.normalize(roifeat, dim=-1)
-                    feat_per_roi.append(roifeat)
-                    roi_nonzero_inds.append(nonzero_inds)
+                        feat_per_roi.append(roifeat)
+                        roi_nonzero_inds.append(nonzero_inds)
+                        # global_feat = global_feat.cuda()
+                        _sim = cosine_similarity(global_feat, roifeat)
 
-                    _sim = cosine_similarity(global_feat, roifeat)
-
-                    rois.append(torch.tensor(list(bbox)))
-                    roi_similarities_with_global_vec.append(_sim)
-                    roi_sim_per_unit_area.append(_sim)  # / iou)
-
+                        rois.append(torch.tensor(list(bbox)))
+                        roi_similarities_with_global_vec.append(_sim)
+                        roi_sim_per_unit_area.append(_sim)  # / iou)
+                # """
+                # global_clip_plus_mask_weighted
+                # # """
                 rois = torch.stack(rois)
                 scores = torch.cat(roi_sim_per_unit_area).to(rois.device)
                 # nms not implemented for Long tensors
@@ -189,7 +201,6 @@ if __name__ == "__main__":
                 retained = torchvision.ops.nms(rois.float().cpu(), scores.float().cpu(), iou_threshold=1.0)
                 feat_per_roi = torch.cat(feat_per_roi, dim=0)  # N, 1024
 
-                # print(f"retained {len(retained)} masks of {rois.shape[0]} total")
                 retained_rois = rois[retained]
                 retained_scores = scores[retained]
                 retained_feat = feat_per_roi[retained]
@@ -204,7 +215,6 @@ if __name__ == "__main__":
                 mask_sim_mat = mask_sim_mat.mean(1)  # avg sim of each mask with each other mask
                 softmax_scores = retained_scores.cuda() - mask_sim_mat
                 softmax_scores = torch.nn.functional.softmax(softmax_scores, dim=0)
-
                 for _roiidx in range(retained.shape[0]):
                     _weighted_feat = (
                         softmax_scores[_roiidx] * global_feat + (1 - softmax_scores[_roiidx]) * retained_feat[_roiidx]
@@ -216,7 +226,6 @@ if __name__ == "__main__":
                     ] += (
                         _weighted_feat[0].detach().cpu().half()
                     )
-
                     outfeat[
                         retained_nonzero_inds[_roiidx][:, 0],
                         retained_nonzero_inds[_roiidx][:, 1],
@@ -230,13 +239,13 @@ if __name__ == "__main__":
 
                 outfeat = outfeat.unsqueeze(0).float()  # interpolate is not implemented for float yet in pytorch
                 outfeat = outfeat.permute(0, 3, 1, 2)  # 1, H, W, feat_dim -> 1, feat_dim, H, W
-                outfeat = torch.nn.functional.interpolate(outfeat, [LOAD_IMG_HEIGHT, LOAD_IMG_HEIGHT], mode="nearest")
+                outfeat = torch.nn.functional.interpolate(outfeat, [LOAD_IMG_HEIGHT, LOAD_IMG_WIDTH], mode="nearest")
                 outfeat = outfeat.permute(0, 2, 3, 1)  # 1, feat_dim, H, W --> 1, H, W, feat_dim
                 outfeat = torch.nn.functional.normalize(outfeat, dim=-1)
                 outfeat = outfeat[0].half()  # --> H, W, feat_dim
 
                 os.makedirs(os.path.dirname(SEMIGLOBAL_FEAT_SAVE_FILE), exist_ok=True)
                 torch.save(outfeat, SEMIGLOBAL_FEAT_SAVE_FILE)
-        except:
-            print(scene, "fail")
-            time.sleep(0.05)
+            except:
+                print(SEMIGLOBAL_FEAT_SAVE_FILE, "fail")
+                time.sleep(0.05)

@@ -75,7 +75,7 @@ def main():
         crop_n_points_downscale_factor=2,
     )
 
-    save_dir = "./data/objaverse_masks_cap3d/"
+    save_dir = "./data/objaverse_masks/"
 
     os.makedirs(save_dir, exist_ok=True)
 
@@ -93,7 +93,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    dataset_dir = "./data/objaverse_frame_cap3d/"
+    dataset_dir = "./data/objaverse_frame/"
     scene_list = os.listdir(dataset_dir)
     length = len(scene_list)
     jobs = args.all_jobs

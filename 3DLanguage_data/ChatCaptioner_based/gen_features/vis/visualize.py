@@ -90,9 +90,9 @@ args = parser.parse_args()
 
 
 project_path = "./data/"
-scene_path = os.path.join(project_path, "objaverse_frame_cap3d")
-feat_path = os.path.join(project_path, "objaverse_2dfeat_cap3d")
-out_path = os.path.join(project_path, "objaverse_feat_cap3d")
+scene_path = os.path.join(project_path, "objaverse_frame")
+feat_path = os.path.join(project_path, "objaverse_2dfeat")
+out_path = os.path.join(project_path, "objaverse_feat")
 
 if args.model == "blip":
     feat_folder = "nps_blip"

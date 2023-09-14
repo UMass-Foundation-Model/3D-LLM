@@ -6,7 +6,7 @@ Data:
 
 ```bash
 $ mkdir data
-$ ln -s {path/to/objaverse_frame_cap3d} ./data/objaverse_frame_cap3d
+$ ln -s {path/to/objaverse_frame} ./data/objaverse_frame
 $ ln -s {path/to/sam_vit_h_4b8939.pth} ./data/sam_vit_h_4b8939.pth
 ```
 
@@ -27,18 +27,18 @@ $ python sam_mask.py --all_jobs 1
 
 We use BLIP and CLIP to extract 2D features.
 
-ATTENTION: please check if the height and width of the images are the same as the variables `LOAD_IMG_HEIGHT` and `LOAD_IMG_WIDTH` in `*_oa_cap3d.py` before running the following commands.
+ATTENTION: please check if the height and width of the images are the same as the variables `LOAD_IMG_HEIGHT` and `LOAD_IMG_WIDTH` in `*_oa.py` before running the following commands.
 
 ### BLIP
 
 ```bash
-$ python blip_oa_cap3d.py --all_jobs 1
+$ python blip_oa.py --all_jobs 1
 ```
 
 ### CLIP
 
 ```bash
-$ python clip_oa_cap3d.py --all_jobs 1
+$ python clip_oa.py --all_jobs 1
 ```
 
 ## Visualize 2D Features

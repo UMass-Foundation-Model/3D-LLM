@@ -62,7 +62,7 @@ class Blip2T5(Blip2Base):
         self.t5_tokenizer = T5TokenizerFast.from_pretrained(t5_model)
 
         location_tokens = []
-        for i in range(64):  # pc -> x,y,z tokens
+        for i in range(32768):  # pc -> x,y,z tokens
             location_tokens.append("<loc%d>" % i)  # bbox_min: 500; bbox_max: 550; (xmin, ymin, zmin) (xmax, ymax, zmax)
         self.t5_tokenizer.add_special_tokens({"additional_special_tokens": location_tokens})
 
@@ -106,7 +106,7 @@ class Blip2T5(Blip2Base):
                 all_pcs[j][:, :1407] = pcs
             all_pcs = all_pcs.cuda()
 
-        pc_embeds = torch.cat([pc_embeds, all_pcs], 1)
+        pc_embeds = pc_embeds + 0.01 * all_pcs
         image_atts = torch.ones(pc_embeds.size()[:-1], dtype=torch.long).to(pc_embeds.device)
 
         query_tokens = self.query_tokens.expand(pc_embeds.shape[0], -1, -1)  # 768
@@ -280,7 +280,7 @@ class Blip2T5(Blip2Base):
                 all_pcs[j][:, :1407] = pcs
             all_pcs = all_pcs.cuda()
 
-        pc_embeds = torch.cat([pc_embeds, all_pcs], 1)
+        pc_embeds = pc_embeds + 0.01 * all_pcs
         image_atts = torch.ones(pc_embeds.size()[:-1], dtype=torch.long).to(pc_embeds.device)
 
         query_tokens = self.query_tokens.expand(pc_embeds.shape[0], -1, -1)
@@ -319,8 +319,9 @@ class Blip2T5(Blip2Base):
                 do_sample=False,
                 num_beams=num_beams,
                 max_new_tokens=max_len,
-                min_length=1,
-                length_penalty=-1,
+                min_length=min_len,
+                length_penalty=length_penalty,
+                # for description, also use repetition penalty
             )
             output_text = self.t5_tokenizer.batch_decode(outputs, skip_special_tokens=False)
 

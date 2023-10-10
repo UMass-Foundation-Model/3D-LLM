@@ -44,7 +44,9 @@ We are still cleaning the grounding & navigation part. All other pre-training da
   
   &emsp;To get 3D features and point clouds of the Objaverse data, please refer to [Step1](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step1-render-images-from-different-views-of-a-scene) and [Step3](https://github.com/UMass-Foundation-Model/3D-LLM/blob/main/README.md#step3-3d-feature-construction-from-rendered-images) of 3DLanguage Data generation - ChatCaptioner based
 
-  &emsp;TODO: We will also release a small set (or probably the whole set) of Objaverse 3D features 
+  &emsp;A small set of objaverse features is released [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link).
+  
+  &emsp;TODO: We will probably release the whole set of Objaverse 3D features 
 #### Scene Data
  &emsp; [Language data released here](https://drive.google.com/file/d/1LcHDzMutr6JlDiixmYEnYJsm7TWsIyvG/view?usp=sharing). 
  

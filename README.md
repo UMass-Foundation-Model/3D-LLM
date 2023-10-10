@@ -24,6 +24,20 @@
 </p>
 Preliminary Code.
 
+## Installation
+Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
+
+```shell
+$ conda create -n lavis python=3.8
+$ conda activate lavis
+
+$ git clone https://github.com/salesforce/LAVIS.git SalesForce-LAVIS
+$ cd SalesForce-LAVIS
+$ pip install -e .
+
+$ pip install positional_encodings
+```
+
 ## Checkpoints
 ### Pretraining Checkpoints
 [Pretraine checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link) are released.
@@ -31,6 +45,35 @@ Preliminary Code.
 ### Finetuning Checkpoints
 [Finetuning checkpoints](https://drive.google.com/drive/folders/1RKP1cz6R6H8YziEc4f3MHW9dCCXQChbA?usp=drive_link) for [ScanQA](https://drive.google.com/file/d/1sPynAO8pI_RPR4pwWTrx8weDTdMPsqtW/view?usp=drive_link), [SQA3d](https://drive.google.com/file/d/1Ka9TWv6cs6h-pPaaQG1auIiQma2xbNFk/view?usp=drive_link), and [3DMV_VQA](https://drive.google.com/file/d/1_h2wPPGO64HY5LUcA1bD8DlZx3WCsY8b/view?usp=drive_link) are released.
 The results are better than preprint-version paper. We will update the camera-ready paper to the arxiv soon.
+
+## Quick Start: Inference
+Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link).
+```
+$ cd 3DLLM_BLIP2-base
+$ conda activate lavis
+
+python inference.py 
+```
+
+
+## Finetuning
+### Installation
+Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)
+1. Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). Modify the "resume_checkpoint_path" path in the yaml files
+2. Download the [questions](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link), modify the "annotations" path in the yaml files
+3. Download the [scannet features](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link)  or [3dmv-vqa features](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link). Modify the path (both train and val) in lavis/datasets/datasets/threedvqa_datasets.py
+4.
+```
+$ cd 3DLLM_BLIP2-base
+
+$ conda activate lavis
+
+python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/<finetune_yaml_file>
+```
+You can also load the finetuning checkpoints [here](https://drive.google.com/drive/folders/1RKP1cz6R6H8YziEc4f3MHW9dCCXQChbA?usp=drive_link).
+
+TODO: huggingface auto load checkpoint.
+
 
 ## Data
 All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing) and [Huggingface](https://huggingface.co/datasets/ShuhongZheng/3D-LLM) (All files are released in Google Drive first and then Huggingface. Please refer to the Google Drive for file structure)
@@ -57,31 +100,7 @@ We are still cleaning the grounding & navigation part. All other pre-training da
 
 All questions can be found [here](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link).
 
-## Finetuning
-### Installation
 
-Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
-
-```shell
-$ conda create -n lavis python=3.8
-$ conda activate lavis
-
-$ git clone https://github.com/salesforce/LAVIS.git SalesForce-LAVIS
-$ cd SalesForce-LAVIS
-$ pip install -e .
-
-$ pip install positional_encodings
-```
-
-### Running
-Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)
-1. Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). Modify the "resume_checkpoint_path" path in the yaml files
-2. Download the [questions](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link), modify the "annotations" path in the yaml files
-3. Download the [scannet features](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link)  or [3dmv-vqa features](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link). Modify the path (both train and val) in lavis/datasets/datasets/threedvqa_datasets.py
-4.
-```
-python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/<finetune_yaml_file>
-```
 
 ## 3DLanguage Data Generation
 
@@ -202,32 +221,16 @@ We will also release our reproduced version of Concept Fusion for our feature ge
 #### Neural Field
 Please refer to [3D-CLR](https://github.com/evelinehong/3D-CLR-Official) repository.
 
-## 3D-LLM_BLIP2-based Pre-training
-### Installation
-
-Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
-
-```shell
-$ conda create -n lavis python=3.8
-$ conda activate lavis
-
-$ git clone https://github.com/salesforce/LAVIS.git SalesForce-LAVIS
-$ cd SalesForce-LAVIS
-$ pip install -e .
-
-$ pip install positional_encodings
-```
-
-### Training
+## Pre-training
 
 ```shell
 $ cd 3DLLM_BLIP2-base
 
 $ conda activate lavis
 # use facebook/opt-2.7b:
-$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_ft.yaml
+$ TODO
 # use flant5
-$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/3dvqa_flant5_ft.yaml
+$ python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/pretrain.yaml
 ```
 ## 3D-LLM_flamingo-based
 TODO.

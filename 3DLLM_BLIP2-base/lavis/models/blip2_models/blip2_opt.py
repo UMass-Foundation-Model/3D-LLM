@@ -316,6 +316,7 @@ class Blip2OPT(Blip2Base):
                 max_new_tokens=max_len,
                 min_length=min_len,
                 length_penalty=length_penalty,
+                repetition_penalty=repetition_penalty,
                 # eos_token_id=self.eos_token_id,
             )
 

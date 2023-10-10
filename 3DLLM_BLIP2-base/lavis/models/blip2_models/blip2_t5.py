@@ -263,6 +263,7 @@ class Blip2T5(Blip2Base):
         answer_list=None,
         prompt="",
         length_penalty=-1,
+        repetition_penalty=1.0,
         **kwargs,
     ):
         with torch.cuda.amp.autocast(enabled=(self.device != torch.device("cpu")), dtype=torch.float32):
@@ -321,6 +322,7 @@ class Blip2T5(Blip2Base):
                 max_new_tokens=max_len,
                 min_length=min_len,
                 length_penalty=length_penalty,
+                repetition_penalty=repetition_penalty,
                 # for description, also use repetition penalty = 1.5
             )
             output_text = self.t5_tokenizer.batch_decode(outputs, skip_special_tokens=False)

@@ -19,7 +19,6 @@ from lavis.models.blip2_models.blip2 import (
     compute_sim_matrix,
     disabled_train,
 )
-from lavis.models.blip_models.blip_outputs import BlipOutput, BlipOutputFeatures
 
 
 @registry.register_model("blip2")

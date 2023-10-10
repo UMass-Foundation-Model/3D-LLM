@@ -14,7 +14,7 @@ parser.add_argument("-v", "--visualize", action="store_true")
 args = parser.parse_args()
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-ckpt_path = "CKPT_PATH"
+ckpt_path = "pretrain_blip2_sam_flant5xl_v1.pth"
 assert os.path.exists(ckpt_path), "Please specify the checkpoint path."
 
 obj_id_path = "assets/objaverse_subset_ids_100.json"
@@ -47,6 +47,7 @@ prompt = [
     "What's the color of the object?",
     "What's the material of the object?",
 ]
+# you can change your questions here
 with open(obj_id_path, "r") as f:
     obj_ids = json.load(f)
 obj_id = np.random.choice(obj_ids)

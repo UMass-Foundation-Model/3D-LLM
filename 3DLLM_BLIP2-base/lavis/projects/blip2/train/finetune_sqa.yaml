@@ -1,0 +1,65 @@
+model:
+  arch: blip2_t5
+  model_type: pretrain_flant5xl
+  use_grad_checkpoint: False
+  mask_embedding: False
+
+datasets:
+  3d_vqa: # name of the dataset builder
+    vis_processor:
+        train:
+          name: "blip2_image_train"
+          image_size: 364
+        eval:
+          name: "blip_image_eval"
+          image_size: 364
+    text_processor:
+        train:
+          name: "blip_question"
+          prompt: ""
+        eval:
+          name: "blip_question"
+    build_info:
+        annotations:
+          train:
+            storage: ScanQA_format/SQA_train.json
+          test:
+            storage: ScanQA_format/SQA_test.json
+          val:
+            storage: ScanQA_format/SQA_test.json
+
+run:
+  task: 3d_vqa
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 1e-4
+  min_lr: 1e-5
+  warmup_lr: 1e-8
+  warmup_steps: 1000
+  weight_decay: 0.05
+  max_epoch: 100
+  batch_size_train: 2
+  batch_size_eval: 4
+  num_workers: 4
+  accum_grad_iters: 1
+
+  max_len: 40
+  min_len: 1
+  num_beams: 5
+ 
+  inference_method: "generate"
+
+  seed: 42
+  output_dir: "output/BLIP2/3DQA"
+
+  amp: True
+  resume_ckpt_path: pretrain_blip2_sam_flant5xl_v1.pth
+  evaluate: False
+  train_splits: ["train"]
+  valid_splits: ["val"]
+  test_splits: ["test"]
+
+  device: "cuda"
+  world_size: 16
+  dist_url: "env://"
+  distributed: True

@@ -62,8 +62,8 @@ class Blip2T5(Blip2Base):
         self.t5_tokenizer = T5TokenizerFast.from_pretrained(t5_model)
 
         location_tokens = []
-        for i in range(32768):  # pc -> x,y,z tokens
-            location_tokens.append("<loc%d>" % i)  # bbox_min: 500; bbox_max: 550; (xmin, ymin, zmin) (xmax, ymax, zmax)
+        for i in range(32768):  
+            location_tokens.append("<loc%d>" % i)  
         self.t5_tokenizer.add_special_tokens({"additional_special_tokens": location_tokens})
 
         t5_config = T5Config.from_pretrained(t5_model)
@@ -129,7 +129,7 @@ class Blip2T5(Blip2Base):
                 text_input,
                 padding="longest",
                 truncation=True,
-                max_length=300,
+                max_length=400,
                 return_tensors="pt",
             ).to(pc_embeds.device)
             output_tokens = self.t5_tokenizer(
@@ -257,7 +257,7 @@ class Blip2T5(Blip2Base):
         samples,
         num_beams=5,
         inference_method="generate",
-        max_len=10,
+        max_len=200,
         min_len=1,
         num_ans_candidates=128,
         answer_list=None,
@@ -321,7 +321,7 @@ class Blip2T5(Blip2Base):
                 max_new_tokens=max_len,
                 min_length=min_len,
                 length_penalty=length_penalty,
-                # for description, also use repetition penalty
+                # for description, also use repetition penalty = 1.5
             )
             output_text = self.t5_tokenizer.batch_decode(outputs, skip_special_tokens=False)
 

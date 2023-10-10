@@ -47,14 +47,14 @@ $ pip install positional_encodings
 The results are better than preprint-version paper. We will update the camera-ready paper to the arxiv soon.
 
 ## Quick Start: Inference
-Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link).
+Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link).Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link).
 ```
 $ cd 3DLLM_BLIP2-base
 $ conda activate lavis
 
 python inference.py 
 ```
-
+TODO: huggingface auto load checkpoint.
 
 ## Finetuning
 Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)

@@ -242,7 +242,7 @@ If you find our work useful, please consider citing:
 @article{3dllm,
  author = {Hong, Yining and Zhen, Haoyu and Chen, Peihao and Zheng, Shuhong and Du, Yilun and Chen, Zhenfang and Gan, Chuang},
  title = {3D-LLM: Injecting the 3D World into Large Language Models},
- journal = {arXiv},
+ journal = {NeurIPS},
  year = {2023},
 } 
 ```

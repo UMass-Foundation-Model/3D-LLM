@@ -47,7 +47,7 @@ $ pip install positional_encodings
 The results are better than preprint-version paper. We will update the camera-ready paper to the arxiv soon.
 
 ## Quick Start: Inference
-Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link).Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link).
+Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link). Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). For more details, please refer to `3DLLM_BLIP2-base/DEMO.md`.
 ```
 $ cd 3DLLM_BLIP2-base
 $ conda activate lavis

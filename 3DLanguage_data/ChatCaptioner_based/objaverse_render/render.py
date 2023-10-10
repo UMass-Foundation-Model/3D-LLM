@@ -61,18 +61,7 @@ def main(args):
         [1 / 12, 1 / 12],
         [1 / 12, 1 / 12],
     ]
-    # phi_view = [
-    #     [0, 0],
-    #     [0, 0],
-    #     [0, 0],
-    #     [0, 0],
-    # ]
-    # theta_view = [
-    #     [1/8, 1/8],
-    #     [3/8, 3/8],
-    #     [-3/8, -3/8],
-    #     [-1/8, -1/8],
-    # ]
+
     for camera_idx in range(4):
         camera.location = random_loc((0, 0, 0), (3, 3), theta=theta_view[camera_idx], phi=phi_view[camera_idx])
         look_at(camera, (0, 0, 0))
@@ -81,9 +70,9 @@ def main(args):
         intr = camera_para["intrinsic"]  # (3, 3)
         extr = camera_para["extrinsic"]  # (4, 4)
         bpy.context.scene.frame_current = camera_idx
-        png_depth_node.file_slots[0].path = f"depth_outside_"
-        exr_depth_node.file_slots[0].path = f"depth_outside_"
-        png_path = f"output/{uid}/rgb_outside_{camera_idx:04d}.png"
+        png_depth_node.file_slots[0].path = f"outside_depth_norm_"
+        exr_depth_node.file_slots[0].path = f"outside_depth_"
+        png_path = f"output/{uid}/outside_view_{camera_idx:03d}.png"
         render_image(png_path)
         camera_dict["view_params"][png_path] = {
             "intrinsic": intr.tolist(),

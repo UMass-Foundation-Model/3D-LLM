@@ -1,9 +1,12 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 model:
-  arch: blip2_t5
-  model_type: pretrain_flant5xl
+  arch: blip2_opt
+  model_type: pretrain_opt2.7b
   use_grad_checkpoint: False
-  mask_embedding: False
 
 datasets:
   3d_vqa: # name of the dataset builder
@@ -23,30 +26,30 @@ datasets:
     build_info:
         annotations:
           train:
-            storage: questions_only/train_questions.json
+            storage: ./examples/all_refer_questions_train.json
           test:
-            storage: questions_only/val_questions.json
+            storage: ./examples/all_refer_questions_val.json
           val:
-            storage: questions_only/test_questions.json
+            storage: ./examples/all_refer_questions_val.json
 
 run:
   task: 3d_vqa
   # optimizer
   lr_sched: "linear_warmup_cosine_lr"
-  init_lr: 1e-4
+  init_lr: 1e-5
   min_lr: 1e-5
   warmup_lr: 1e-8
   warmup_steps: 1000
   weight_decay: 0.05
   max_epoch: 100
-  batch_size_train: 2
-  batch_size_eval: 4
-  num_workers: 4
+  batch_size_train: 8
+  batch_size_eval: 16
+  num_workers: 6
   accum_grad_iters: 1
 
-  max_len: 40
+  max_len: 200
   min_len: 1
-  num_beams: 5
+  num_beams: 1
  
   inference_method: "generate"
 
@@ -54,13 +57,13 @@ run:
   output_dir: "output/BLIP2/3DQA"
 
   amp: True
-  resume_ckpt_path: pretrain_blip2_sam_flant5xl_v1.pth
+
   evaluate: False
   train_splits: ["train"]
   valid_splits: ["val"]
   test_splits: ["test"]
 
   device: "cuda"
-  world_size: 16
+  world_size: 2
   dist_url: "env://"
   distributed: True

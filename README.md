@@ -91,7 +91,7 @@ We are still cleaning the grounding & navigation part. All other pre-training da
   
   &emsp;TODO: We will probably release the whole set of Objaverse 3D features 
 #### Scene Data
- &emsp; [Language data released here](https://drive.google.com/file/d/1LcHDzMutr6JlDiixmYEnYJsm7TWsIyvG/view?usp=sharing). 
+ &emsp; [Language data released here](https://drive.google.com/file/d/18AVyAWwMwqP8nyZQfTpEMw1Wfhghjw0b/view?usp=drive_link). 
  
  &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/drive/folders/1bJpK00UFRZGH7tdx3PaqDrrTfHNP6B2K?usp=drive_link). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction). Please use v2 to be consistent with the checkpoints (and also result in better performances).
 

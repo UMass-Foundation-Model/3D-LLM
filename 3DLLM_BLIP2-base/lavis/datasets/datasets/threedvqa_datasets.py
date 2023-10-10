@@ -54,8 +54,8 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
             except:
                 pass
         self.annotation = new_annotation
-        self.pc_feat_root = "examples/voxelized_features_sam_nonzero"  # 2
-        self.voxel_root = "examples/voxelized_voxels_sam_nonzero"  # flatten
+        self.pc_feat_root = "examples/voxelized_features_sam_nonzero_preprocess"  
+        self.voxel_root = "examples/voxelized_voxels_sam_nonzero_preprocess"  
         self.annotation = [
             ann for ann in self.annotation if os.path.exists(os.path.join(self.pc_feat_root, ann["scene_id"] + ".pt"))
         ]
@@ -124,8 +124,8 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
             except:
                 pass
         self.annotation = new_annotation
-        self.pc_feat_root = "examples/voxelized_features_sam_nonzero"
-        self.voxel_root = "examples/voxelized_voxels_sam_nonzero"
+        self.pc_feat_root = "examples/voxelized_features_sam_nonzero_preprocess"
+        self.voxel_root = "examples/voxelized_voxels_sam_nonzero_preprocess"
         self.annotation = [
             ann for ann in self.annotation if os.path.exists(os.path.join(self.pc_feat_root, ann["scene_id"] + ".pt"))
         ]

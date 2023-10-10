@@ -69,14 +69,14 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
         pc = torch.tensor(pc).float().cpu()
         # sample 10000 points: [N, 1408] -> [10000, 1408]
 
-        if pc_feat.shape[0] > 10000:
-            idxes = torch.sort(torch.randperm(pc_feat.shape[0])[:10000])[1]
+        if pc_feat.shape[0] > 5000:
+            idxes = torch.sort(torch.randperm(pc_feat.shape[0])[:5000])[1]
             pc_feat = pc_feat[idxes]
             pc = pc[idxes]
         else:
-            pc_feat = torch.cat([pc_feat, torch.zeros(10000 - pc_feat.shape[0], 1408)], dim=0)
+            pc_feat = torch.cat([pc_feat, torch.zeros(5000 - pc_feat.shape[0], 1408)], dim=0)
 
-            pc = torch.cat([pc, torch.zeros(10000 - pc.shape[0], 3)], dim=0)
+            pc = torch.cat([pc, torch.zeros(5000 - pc.shape[0], 3)], dim=0)
 
         answer_weight = {}
         for answer in ann["answers"]:
@@ -139,14 +139,14 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
         pc = torch.tensor(pc).float().cpu()
         # sample 10000 points: [N, 1408] -> [10000, 1408]
 
-        if pc_feat.shape[0] > 10000:
-            idxes = torch.sort(torch.randperm(pc_feat.shape[0])[:10000])[1]
+        if pc_feat.shape[0] > 5000:
+            idxes = torch.sort(torch.randperm(pc_feat.shape[0])[:5000])[1]
             pc_feat = pc_feat[idxes]
             pc = pc[idxes]
 
         else:
-            pc_feat = torch.cat([pc_feat, torch.zeros(10000 - pc_feat.shape[0], 1408)], dim=0)
-            pc = torch.cat([pc, torch.zeros(10000 - pc.shape[0], 3)], dim=0)
+            pc_feat = torch.cat([pc_feat, torch.zeros(5000 - pc_feat.shape[0], 1408)], dim=0)
+            pc = torch.cat([pc, torch.zeros(5000 - pc.shape[0], 3)], dim=0)
 
         return {
             "pc_feat": pc_feat,

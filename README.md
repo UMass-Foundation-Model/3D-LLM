@@ -22,7 +22,8 @@
     <img src="figs/pipeline.png" alt="Logo" width="80%">
   </p>
 </p>
-Preliminary Code.
+
+3D-LLM is the first Large Language Model that could take 3D representations as inputs. It is able to handle both object (e.g., objaverse) and scene data (e.g., scannet & hm3d). 
 
 ## Installation
 Install [salesforce-lavis](https://github.com/salesforce/LAVIS)

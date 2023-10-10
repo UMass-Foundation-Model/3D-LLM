@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <h1 align="center">3D-LLM: Injecting the 3D World into Large Language Models</h1>
+  <h1 align="center">3D-LLM: Injecting the 3D World into Large Language Models (NeurIPS 2023 Spotlight!) </h1>
   <p align="center">
     <a href="https://evelinehong.github.io">Yining Hong</a>,
     <a href="https://haoyuzhen.com">Haoyu Zhen</a>,
@@ -24,11 +24,19 @@
 </p>
 Preliminary Code.
 
+## Checkpoints
+### Pretraining Checkpoints
+[Pretraine checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link) are released.
+
+### Finetuning Checkpoints
+[Finetuning checkpoints](https://drive.google.com/drive/folders/1RKP1cz6R6H8YziEc4f3MHW9dCCXQChbA?usp=drive_link) for [ScanQA](https://drive.google.com/file/d/1sPynAO8pI_RPR4pwWTrx8weDTdMPsqtW/view?usp=drive_link), [SQA3d](https://drive.google.com/file/d/1Ka9TWv6cs6h-pPaaQG1auIiQma2xbNFk/view?usp=drive_link), and [3DMV_VQA](https://drive.google.com/file/d/1_h2wPPGO64HY5LUcA1bD8DlZx3WCsY8b/view?usp=drive_link) are released.
+The results are better than preprint-version paper. We will update the camera-ready paper to the arxiv soon.
+
 ## Data
-All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing)
+All data will be gradually released in [Google Drive](https://drive.google.com/drive/folders/188Yd7tmiUfyct-dVMpkQ8q_tnqkb-4bo?usp=sharing) and [Huggingface](https://huggingface.co/datasets/ShuhongZheng/3D-LLM) (All files are released in Google Drive first and then Huggingface. Please refer to the Google Drive for file structure)
 
 ### Pretraining Data
-We are still cleaning the grounding part. All other pre-training data are released.
+We are still cleaning the grounding & navigation part. All other pre-training data are released.
 #### Object Data
   &emsp;Language annotations of object data released [here](https://drive.google.com/file/d/17K1ZGb1HpvPj36a84GefGQK7DOkRp_32/view?usp=sharing).
 
@@ -40,10 +48,12 @@ We are still cleaning the grounding part. All other pre-training data are releas
 #### Scene Data
  &emsp; [Language data released here](https://drive.google.com/file/d/1LcHDzMutr6JlDiixmYEnYJsm7TWsIyvG/view?usp=sharing). 
  
- &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/file/d/118JSjS1nl-1v87wC2oTxEmQzSSyCIBXM/view?usp=sharing). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction)
+ &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/drive/folders/1bJpK00UFRZGH7tdx3PaqDrrTfHNP6B2K?usp=drive_link). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction). Please use v2 to be consistent with the checkpoints (and also result in better performances).
 
 ### Finetuning Data
-TODO.
+3D features and point clouds of Scannet (used for finetuning ScanQA and SQA3D) are released in [here](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link). 3D features and point clouds of 3DMV-VQA are released [here](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link) (3DMV-VQA data will be further updated for a clearer structure).
+
+All questions can be found [here](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link).
 
 ## 3DLanguage Data Generation
 

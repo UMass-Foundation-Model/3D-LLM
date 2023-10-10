@@ -57,7 +57,6 @@ python inference.py
 
 
 ## Finetuning
-### Installation
 Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)
 1. Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). Modify the "resume_checkpoint_path" path in the yaml files
 2. Download the [questions](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link), modify the "annotations" path in the yaml files

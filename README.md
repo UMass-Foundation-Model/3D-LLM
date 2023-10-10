@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <h1 align="center">3D-LLM: Injecting the 3D World into Large Language Models (NeurIPS 2023 Spotlight!) </h1>
+  <h1 align="center">3D-LLM: Injecting the 3D World into Large Language Models (NeurIPS 2023 Spotlight) </h1>
   <p align="center">
     <a href="https://evelinehong.github.io">Yining Hong</a>,
     <a href="https://haoyuzhen.com">Haoyu Zhen</a>,
@@ -56,6 +56,32 @@ We are still cleaning the grounding & navigation part. All other pre-training da
 3D features and point clouds of Scannet (used for finetuning ScanQA and SQA3D) are released in [here](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link). 3D features and point clouds of 3DMV-VQA are released [here](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link) (3DMV-VQA data will be further updated for a clearer structure).
 
 All questions can be found [here](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link).
+
+## Finetuning
+### Installation
+
+Install [salesforce-lavis](https://github.com/salesforce/LAVIS)
+
+```shell
+$ conda create -n lavis python=3.8
+$ conda activate lavis
+
+$ git clone https://github.com/salesforce/LAVIS.git SalesForce-LAVIS
+$ cd SalesForce-LAVIS
+$ pip install -e .
+
+$ pip install positional_encodings
+```
+
+### Running
+Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)
+1. Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). Modify the "resume_checkpoint_path" path in the yaml files
+2. Download the [questions](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link), modify the "annotations" path in the yaml files
+3. Download the [scannet features](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link)  or [3dmv-vqa features](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link). Modify the path (both train and val) in lavis/datasets/datasets/threedvqa_datasets.py
+4.
+```
+python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/<finetune_yaml_file>
+```
 
 ## 3DLanguage Data Generation
 
@@ -176,7 +202,7 @@ We will also release our reproduced version of Concept Fusion for our feature ge
 #### Neural Field
 Please refer to [3D-CLR](https://github.com/evelinehong/3D-CLR-Official) repository.
 
-## 3D-LLM_BLIP2-based
+## 3D-LLM_BLIP2-based Pre-training
 ### Installation
 
 Install [salesforce-lavis](https://github.com/salesforce/LAVIS)

@@ -2,6 +2,8 @@
 3DLanguage_data/ChatCaptioner_based/output
 3DLLM_BLIP2-base/examples
 3DLLM_BLIP2-base/lavis/output
+3DLLM_BLIP2-base/tmp
+3DLLM_BLIP2-base/data
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

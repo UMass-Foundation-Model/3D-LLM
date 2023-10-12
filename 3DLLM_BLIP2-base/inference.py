@@ -10,6 +10,7 @@ from lavis.common.registry import registry
 
 # ======== Step 0: Configurations >>>>>>>>
 parser = argparse.ArgumentParser()
+parser.add_argument("--mode", default="object", type=str, choices=["object", "room"])
 parser.add_argument("-v", "--visualize", action="store_true")
 args = parser.parse_args()
 
@@ -40,20 +41,36 @@ text_processor = registry.get_processor_class(processor_cfg.name).from_config(pr
 
 # ======== Step 2: Prepare input >>>>>>>>
 print("Preparing input...")
-prompt = [
-    "Describe the 3D scene.",
-    "Describe the 3D scene in one sentence.",
-    "What's depicted in the scene?",
-    "What's the color of the object?",
-    "What's the material of the object?",
-]
-# you can change your questions here
-with open(obj_id_path, "r") as f:
-    obj_ids = json.load(f)
-obj_id = np.random.choice(obj_ids)
-print("obj_id: ", obj_id)
-feature_path = os.path.join(obj_feat_path, "features", f"{obj_id}_outside.pt")
-points_path = os.path.join(obj_feat_path, "points", f"{obj_id}_outside.npy")
+if args.mode == "object":
+    prompt = [
+        "Describe the 3D scene.",
+        "Describe the 3D scene in one sentence.",
+        "What's depicted in the scene?",
+        "What's the color of the object?",
+        "What's the material of the object?",
+    ]
+    with open(obj_id_path, "r") as f:
+        obj_ids = json.load(f)
+    obj_id = np.random.choice(obj_ids)
+    print("obj_id: ", obj_id)
+    feature_path = os.path.join(obj_feat_path, "features", f"{obj_id}_outside.pt")
+    points_path = os.path.join(obj_feat_path, "points", f"{obj_id}_outside.npy")
+else:
+    prompt = [
+        "Agent 1: What's the room like??",
+        "Agent 1: I really like the layout of this room! It has a table where I can read books.",
+        "I want to clean up this room. What should I do next?",
+        "I want to clean up this room. I have done these things: 1. cleaned up the table; 2. clean up the chair. What should I do next?",
+        "Agent 1: What do you think about this room?",
+        "Human: Could you bring my pillow for me?",
+        "Human: Could you bring my pillow for me? Robot: Sure! Where is the pillow? Human: It's on the sofa.",
+        "Where is the sofa located?",
+        "Agent 1: Check this out! This room is what I dream of! Agent 2: Yes! I see a television here!"
+    ]
+    room_id = "scene0480_00"
+    print("room_id: ", room_id)
+    feature_path = os.path.join("assets", f"{room_id}.pt")
+    points_path = os.path.join("assets", f"{room_id}.npy")
 
 prompt = np.random.choice(prompt)
 prompt = text_processor(prompt)

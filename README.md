@@ -53,7 +53,8 @@ Download the objaverse subset features [here](https://drive.google.com/file/d/1m
 $ cd 3DLLM_BLIP2-base
 $ conda activate lavis
 
-python inference.py 
+python inference.py # for objects
+python inference.py --mode room # for scenes
 ```
 TODO: huggingface auto load checkpoint.
 

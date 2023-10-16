@@ -51,6 +51,15 @@ class Blip2T5(Blip2Base):
 
         self.tokenizer = self.init_tokenizer()
 
+        self.visual_encoder, self.ln_vision = self.init_vision_encoder(
+            vit_model, img_size, drop_path_rate, use_grad_checkpoint, vit_precision
+        )
+
+        for name, param in self.visual_encoder.named_parameters():
+            param.requires_grad = False
+        self.visual_encoder = self.visual_encoder.eval()
+        self.visual_encoder.train = disabled_train
+        
         self.Qformer, self.query_tokens = self.init_Qformer(num_query_token, 1408)
         self.Qformer.cls = None
         self.Qformer.bert.embeddings.word_embeddings = None

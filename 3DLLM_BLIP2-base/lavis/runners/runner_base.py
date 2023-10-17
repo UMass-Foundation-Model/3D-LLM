@@ -89,7 +89,7 @@ class RunnerBase:
             if self.use_distributed:
                 if self._wrapped_model is None:
                     self._wrapped_model = DDP(
-                        self._model, device_ids=[self.config.run_cfg.gpu], find_unused_parameters=False
+                        self._model, device_ids=[self.config.run_cfg.gpu], find_unused_parameters=True
                     )
             else:
                 self._wrapped_model = self._model

@@ -2,10 +2,12 @@ import time
 import torch
 import torchvision
 import cv2
+from PIL import Image
 import numpy as np
 from tqdm import tqdm
 import os
 from torch import nn
+from lavis.processors import load_processor
 from lavis.models.eva_vit import create_eva_vit_g
 import argparse
 
@@ -83,6 +85,7 @@ if __name__ == "__main__":
     jobs = args.all_jobs
     ids = N // jobs + 1
     visual_encoder = create_eva_vit_g(LOAD_IMG_HEIGHT).to(device).eval()
+    vis_processor = load_processor("blip_image_eval").build(image_size=LOAD_IMG_HEIGHT)
 
     for scene in tqdm(scene_list[args.job * ids : min(N, args.job * ids + ids)]):
         if os.path.exists(os.path.join(voxel_feature_path, "features", f"{scene}_outside.pt")) and os.path.exists(
@@ -112,9 +115,8 @@ if __name__ == "__main__":
 
                 raw_image = cv2.imread(INPUT_IMAGE_PATH)
                 raw_image = cv2.resize(raw_image, (LOAD_IMG_WIDTH, LOAD_IMG_HEIGHT))
-                image = (
-                    torch.tensor(raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT]).permute(2, 0, 1).unsqueeze(0).to(device)
-                )
+                raw_image2 = Image.fromarray(raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT])
+                image = vis_processor(raw_image2).unsqueeze(0).to(device)
 
                 with torch.no_grad():
                     output = visual_encoder(image)
@@ -158,10 +160,11 @@ if __name__ == "__main__":
 
                     if iou < 0.005:
                         continue
-                    roi = torch.ones((LOAD_IMG_HEIGHT, LOAD_IMG_HEIGHT, 3))
-                    img_roi = torch.tensor(raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT])[x0:x1, y0:y1]
+                    roi = np.ones((LOAD_IMG_HEIGHT, LOAD_IMG_HEIGHT, 3)).astype(int)
+                    img_roi = raw_image[:LOAD_IMG_HEIGHT, :LOAD_IMG_HEIGHT][x0:x1, y0:y1]
                     roi[x0:x1, y0:y1] = img_roi
-                    img_roi = roi.permute(2, 0, 1).unsqueeze(0).to(device)
+                    roi = Image.fromarray(roi.astype(np.uint8))
+                    img_roi = vis_processor(roi).unsqueeze(0).to(device)
 
                     with torch.no_grad():
                         roifeat = visual_encoder(img_roi)

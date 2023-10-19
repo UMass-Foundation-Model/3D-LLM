@@ -72,6 +72,12 @@ $ conda activate lavis
 python -m torch.distributed.run --nproc_per_node=8 train.py --cfg-path lavis/projects/blip2/train/<finetune_yaml_file>
 ```
 You can also load the finetuning checkpoints [here](https://drive.google.com/drive/folders/1RKP1cz6R6H8YziEc4f3MHW9dCCXQChbA?usp=drive_link).
+5.**Calculating scores**
+```
+cd calculate_scores
+python calculate_score_<task>.py --folder <your result dir> --epoch <your epoch>
+```
+please also modify the feature and question path in the scripts
 
 TODO: huggingface auto load checkpoint.
 

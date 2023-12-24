@@ -95,7 +95,7 @@ class Blip2T5(Blip2Base):
         self.pos_embedding = pos_model(x).squeeze().cuda()
 
         self.max_txt_len = max_txt_len
-        self.prompt = ""
+        self.prompt = prompt
         self._apply_lemmatizer = apply_lemmatizer
         self._lemmatizer = None
 
@@ -310,7 +310,8 @@ class Blip2T5(Blip2Base):
         prompt = self.prompt
 
         if prompt:
-            text_input = [prompt.format(question) for question in samples["text_input"]]
+            # text_input = [prompt.format(question) for question in samples["text_input"]]
+            text_input = [question + " " + prompt for question in samples["text_input"]]         # put prompt after each question    
         else:
             text_input = samples["text_input"]
 

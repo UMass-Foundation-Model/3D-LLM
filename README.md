@@ -103,6 +103,8 @@ We are still cleaning the grounding & navigation part. All other pre-training da
  
  &emsp; 3D features and point clouds (~250G) are released [here](https://drive.google.com/drive/folders/1bJpK00UFRZGH7tdx3PaqDrrTfHNP6B2K?usp=drive_link). However, if you want to explore generating the features yourself, please refer to the Three-step 3D Feature Extraction part [here](https://github.com/UMass-Foundation-Model/3D-LLM#three-step-3d-feature-extraction). Please use v2 to be consistent with the checkpoints (and also result in better performances).
 
+ &emsp;chat: 73103. task: 84531
+
 ### Finetuning Data
 3D features and point clouds of Scannet (used for finetuning ScanQA and SQA3D) are released in [here](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link). 3D features and point clouds of 3DMV-VQA are released [here](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link) (3DMV-VQA data will be further updated for a clearer structure).
 

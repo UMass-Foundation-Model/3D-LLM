@@ -48,7 +48,7 @@ $ pip install positional_encodings
 The results are better than preprint-version paper. We will update the camera-ready paper to the arxiv soon.
 
 ## Quick Start: Inference
-Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link). Download the [pretrained checkpoints](https://drive.google.com/file/d/1tiis8mOdZGBzmR7vgZtRE4Ni_2FE4nTr/view?usp=drive_link). For more details, please refer to `3DLLM_BLIP2-base/DEMO.md`.
+Download the objaverse subset features [here](https://drive.google.com/file/d/1mJZONfWREfIUAPYXP65D65uS2EoplAfR/view?usp=drive_link). Download the [pretrained checkpoints](https://drive.google.com/drive/folders/1urI2I3S8SgLD8L9brl4ae1Mul_yhCxJe?usp=drive_link). For more details, please refer to `3DLLM_BLIP2-base/DEMO.md`.
 ```
 $ cd 3DLLM_BLIP2-base
 $ conda activate lavis
@@ -62,7 +62,7 @@ TODO: huggingface auto load checkpoint.
 Finetuning config yaml files that need to be changed are in [this directory](https://github.com/UMass-Foundation-Model/3D-LLM/tree/main/3DLLM_BLIP2-base/lavis/projects/blip2/train)
 1. Download the [pretrained checkpoints](https://drive.google.com/file/d/1tiis8mOdZGBzmR7vgZtRE4Ni_2FE4nTr/view?usp=drive_link). Modify the "resume_checkpoint_path" path in the yaml files
 2. Download the [questions](https://drive.google.com/drive/folders/14MDiDl6Cch_B27Q0aZgdElhAEOBBpn2o?usp=drive_link), modify the "annotations" path in the yaml files
-3. Download the [scannet features](https://drive.google.com/drive/folders/1CsEt48jj5uCyelGcXXJBkGH86QYeCE8D?usp=drive_link)  or [3dmv-vqa features](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link). Modify the path (both train and val) in lavis/datasets/datasets/threedvqa_datasets.py
+3. Download the [scannet features](https://drive.google.com/drive/folders/1H1SKZsK_XpMkXntwhY4BqSxsGCRP8cgp?usp=drive_link)  or [3dmv-vqa features](https://drive.google.com/drive/folders/1NdFKKn_IZxGezi6fXA60rF1uxTOmhOet?usp=drive_link). Modify the path (both train and val) in lavis/datasets/datasets/threedvqa_datasets.py
 4.
 ```
 $ cd 3DLLM_BLIP2-base

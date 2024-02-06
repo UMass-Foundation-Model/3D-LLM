@@ -59,10 +59,11 @@ if __name__ == "__main__":
 
                 global_feat = torch.tensor(output)
                 global_feat = global_feat.half().cuda()
-                global_feat = global_feat[:, :-1, :].resize(1, 36, 36, 1408).permute((0, 3, 1, 2))
-                m = nn.AdaptiveAvgPool2d((1, 1))
-                global_feat = m(global_feat)
-                global_feat = global_feat.squeeze(-1).squeeze(-1)
+                global_feat = global_feat.mean(1)
+                # global_feat = global_feat[:, :-1, :].resize(1, 36, 36, 1408).permute((0, 3, 1, 2))
+                # m = nn.AdaptiveAvgPool2d((1, 1))
+                # global_feat = m(global_feat)
+                # global_feat = global_feat.squeeze(-1).squeeze(-1)
 
                 global_feat = torch.nn.functional.normalize(global_feat, dim=-1)
                 FEAT_DIM = global_feat.shape[-1]
@@ -102,10 +103,11 @@ if __name__ == "__main__":
                     roifeat = visual_encoder(img_roi)
                     roifeat = torch.tensor(roifeat)
                     roifeat = roifeat.half().cuda()
-                    roifeat = roifeat[:, :-1, :].resize(1, 36, 36, 1408).permute((0, 3, 1, 2))
-                    m = nn.AdaptiveAvgPool2d((1, 1))
-                    roifeat = m(roifeat)
-                    roifeat = roifeat.squeeze(-1).squeeze(-1)
+                    roifeat = roifeat.mean(1)
+                    # roifeat = roifeat[:, :-1, :].resize(1, 36, 36, 1408).permute((0, 3, 1, 2))
+                    # m = nn.AdaptiveAvgPool2d((1, 1))
+                    # roifeat = m(roifeat)
+                    # roifeat = roifeat.squeeze(-1).squeeze(-1)
 
                     roifeat = torch.nn.functional.normalize(roifeat, dim=-1)
                     feat_per_roi.append(roifeat)

@@ -326,7 +326,7 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    golds = json.load(open(os.path.join('../data/ScanQA_format/SQA_test.json')))
+    golds = json.load(open(os.path.join('../data/SQA_test.json')))
 
     args.folder = "../lavis/output/BLIP2/3DQA/" + args.folder    
 
@@ -346,7 +346,7 @@ if __name__=="__main__":
 
     scores={}
 
-    pc_feat_root = "../data/voxelized_features_sam_nonzero_preprocess"
+    pc_feat_root = "/data/sungnyun/dataset/voxelized_features_sam_nonzero_preprocess"  
 
     golds = [ann for ann in golds if "scene_id" in ann and os.path.exists(os.path.join(pc_feat_root, ann["scene_id"] + ".pt"))]
 

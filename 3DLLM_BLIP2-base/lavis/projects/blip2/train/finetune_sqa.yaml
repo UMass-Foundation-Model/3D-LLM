@@ -22,11 +22,11 @@ datasets:
     build_info:
         annotations:
           train:
-            storage: ScanQA_format/SQA_train.json
+            storage: /home/sungnyun/3D-LLM/3DLLM_BLIP2-base/data/SQA_train.json
           test:
-            storage: ScanQA_format/SQA_test.json
+            storage: /home/sungnyun/3D-LLM/3DLLM_BLIP2-base/data/SQA_test.json
           val:
-            storage: ScanQA_format/SQA_test.json
+            storage: /home/sungnyun/3D-LLM/3DLLM_BLIP2-base/data/SQA_test.json
 
 run:
   task: 3d_vqa
@@ -53,7 +53,7 @@ run:
   output_dir: "output/BLIP2/3DQA"
 
   amp: True
-  resume_ckpt_path: pretrain_blip2_sam_flant5xl_v1.pth
+  resume_ckpt_path: /home/sungnyun/3D-LLM/ckpt/pretrain_blip2_sam_flant5xl_v2.pth
   evaluate: False
   train_splits: ["train"]
   valid_splits: ["val"]

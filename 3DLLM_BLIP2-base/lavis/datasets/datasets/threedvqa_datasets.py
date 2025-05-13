@@ -54,8 +54,8 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
             except:
                 pass
         self.annotation = new_annotation
-        self.pc_feat_root = "examples/voxelized_features_sam_nonzero_preprocess"  
-        self.voxel_root = "examples/voxelized_voxels_sam_nonzero_preprocess"  
+        self.pc_feat_root = "/data/sungnyun/dataset/voxelized_features_sam_nonzero_preprocess"  
+        self.voxel_root = "/data/sungnyun/dataset/voxelized_voxels_sam_nonzero_preprocess"  
         self.annotation = [
             ann for ann in self.annotation if os.path.exists(os.path.join(self.pc_feat_root, ann["scene_id"] + ".pt"))
         ]
@@ -63,6 +63,9 @@ class ThreeDVQADataset(VQADataset, __DisplMixin):
     def __getitem__(self, index):
         ann = self.annotation[index]
         caption = self.text_processor(ann["question"])
+        ###################
+        caption = self.text_processor(ann["situation"]) + ' ' + caption
+        ###################
         scene_id = ann["scene_id"]
         pc_feat = torch.load(os.path.join(self.pc_feat_root, f"{scene_id}.pt"), map_location="cpu")
         pc = np.load(os.path.join(self.voxel_root, f"{scene_id}.npy"))
@@ -124,8 +127,8 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
             except:
                 pass
         self.annotation = new_annotation
-        self.pc_feat_root = "examples/voxelized_features_sam_nonzero_preprocess"
-        self.voxel_root = "examples/voxelized_voxels_sam_nonzero_preprocess"
+        self.pc_feat_root = "/data/sungnyun/dataset/voxelized_features_sam_nonzero_preprocess"
+        self.voxel_root = "/data/sungnyun/dataset/voxelized_voxels_sam_nonzero_preprocess"
         self.annotation = [
             ann for ann in self.annotation if os.path.exists(os.path.join(self.pc_feat_root, ann["scene_id"] + ".pt"))
         ]
@@ -133,6 +136,9 @@ class ThreeDVQAEvalDataset(VQAEvalDataset):
     def __getitem__(self, index):
         ann = self.annotation[index]
         caption = self.text_processor(ann["question"])
+        ###################
+        caption = self.text_processor(ann["situation"]) + ' ' + caption
+        ###################
         scene_id = ann["scene_id"]
         pc_feat = torch.load(os.path.join(self.pc_feat_root, f"{scene_id}.pt"), map_location="cpu")  # [N, 1408]
         pc = np.load(os.path.join(self.voxel_root, f"{scene_id}.npy"))
